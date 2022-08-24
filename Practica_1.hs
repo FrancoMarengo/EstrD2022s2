@@ -148,3 +148,82 @@ oBien :: Bool -> Bool -> Bool
 oBien True _    = True
 oBien _    True = True
 oBien _    _    = False
+
+-- Registros 
+-- 1 
+data Persona = P String Int 
+              -- Nombre Edad
+              deriving Show
+
+nombre :: Persona -> String
+nombre (P n e) = n
+
+edad :: Persona -> Int
+edad (P n e) = e
+
+crecer :: Persona -> Persona
+crecer (P n e) = P n (e+1)
+
+cambioDeNombre :: String -> Persona -> Persona
+cambioDeNombre n (P _ e) = P n e
+
+esMayorQueLaOtra :: Persona -> Persona -> Bool
+esMayorQueLaOtra (P _ e1) (P _ e2) = e1 > e2
+
+laQueEsMayor :: Persona -> Persona -> Persona
+laQueEsMayor p1 p2 = if (esMayorQueLaOtra p1 p2) 
+                      then p1
+                      else p2
+
+-- caso en el que ambas sean de la misma edad retorne error 
+laQueEsMayor' :: Persona -> Persona -> Persona 
+laQueEsMayor' p1 p2 = if (tienenLaMismaEdad p1 p2) 
+                      then error "Ambas personas tienen la misma edad"
+                      else if (esMayorQueLaOtra p1 p2)
+                            then p1
+                            else p2
+
+tienenLaMismaEdad :: Persona -> Persona -> Bool
+tienenLaMismaEdad (P _ e1) (P _ e2) = e1 == e2
+
+-- 2
+data TipoDePokemon = Agua | Fuego | Planta
+                     deriving Show
+data Entrenador = E String Pokemon Pokemon
+                 -- Nombre Pokemon Pokemon
+                 deriving Show
+data Pokemon = PK TipoDePokemon Int
+               -- TipoDePokemon Porcentaje de energía
+               deriving Show
+
+superaA :: Pokemon -> Pokemon -> Bool
+superaA (PK t1 _) (PK t2 _) = esTipoMasFuerte t1 t2
+
+esTipoMasFuerte :: TipoDePokemon -> TipoDePokemon -> Bool
+esTipoMasFuerte Agua Fuego   = True
+esTipoMasFuerte Fuego Planta = True
+esTipoMasFuerte Planta Agua  = True 
+esTipoMasFuerte _      _     = False 
+
+cantidadDePokemonDe :: TipoDePokemon -> Entrenador -> Int
+cantidadDePokemonDe t (E _ p1 p2) = cantidadDePokemonDe' t p1 p2
+
+cantidadDePokemonDe' :: TipoDePokemon -> Pokemon -> Pokemon -> Int
+cantidadDePokemonDe' t (PK tp1 _) (PK tp2 _) = if (sonMismoTipo t tp1 && sonMismoTipo t tp2)
+                                                then 2
+                                                else if (sonMismoTipo t tp1 || sonMismoTipo t tp2)
+                                                      then 1
+                                                      else 0
+
+sonMismoTipo :: TipoDePokemon -> TipoDePokemon -> Bool
+sonMismoTipo Fuego Fuego   = True
+sonMismoTipo Agua Agua     = True
+sonMismoTipo Planta Planta = True
+sonMismoTipo _      _      = False
+
+juntarPokemon :: (Entrenador, Entrenador) -> [Pokemon]
+juntarPokemon (e1, e2) = listaDePokemon e1 ++ listaDePokemon e2
+
+listaDePokemon :: Entrenador -> [Pokemon]
+listaDePokemon (E _ p1 p2) = p1:p2:[]
+
