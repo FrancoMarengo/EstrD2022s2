@@ -227,3 +227,44 @@ juntarPokemon (e1, e2) = listaDePokemon e1 ++ listaDePokemon e2
 listaDePokemon :: Entrenador -> [Pokemon]
 listaDePokemon (E _ p1 p2) = p1:p2:[]
 
+-- Funciones Polimórficas
+-- 1 
+-- a)
+loMismo :: a -> a
+loMismo x = x
+
+siempreSiete :: a -> Int
+siempreSiete x = 7
+
+swap :: (a,b) -> (b, a)
+swap (x, y) = (y, x)
+-- Las variables son de tipos diferentes ya que, si se le pasa una tupla (Int, String) como parámetro, entonces esperará como retorno
+-- una tupla de tipo (String, Int). Si esto no es así, entonces se espera como retorno una tupla (Int, String).
+
+-- 2
+-- Estas funciones son polimórficamente paramétricas ya que al momento de llamarlas y pasarle los parámetros, éstos pueden
+-- ser de cualquier tipo y la función seguiria funcionando de manera correcta.
+
+-- Pattern matching sobre listas
+-- 2
+estaVacia :: [a] -> Bool
+estaVacia [] = True
+estaVacia _  = False
+
+-- 3
+-- PRECOND: La lista pasada como parámetro no puede estar vacía.
+elPrimero :: [a] -> a
+elPrimero []     = error "La lista no puede ser vacia."
+elPrimero (x:xs) = x
+
+-- 4
+-- PRECOND: La lista pasada como parámetro no puede estar vacía.
+sinElPrimero :: [a] -> [a]
+sinElPrimero []     = error "La lista no puede ser vacia."
+sinElPrimero (x:xs) = xs
+
+-- 5
+-- PRECOND: La lista pasada como parámetro no puede estar vacía.
+splitHead :: [a] -> (a, [a])
+splitHead []     = error "La lista no puede ser vacia."
+splitHead (x:xs) = (x, xs)
