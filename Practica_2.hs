@@ -139,3 +139,25 @@ sinLosPrimeros :: Int -> [a] -> [a]
 sinLosPrimeros n []     = []
 sinLosPrimeros 0 xs     = xs
 sinLosPrimeros n (x:xs) = sinLosPrimeros (n-1) xs
+
+-- Registros
+-- 1
+data Persona = P String Int
+              -- Nombre Edad
+              deriving Show
+
+-- Dados una edad y una lista de personas devuelve a las personas mayores a esa edad.
+mayoresA :: Int -> [Persona] -> [Persona]
+mayoresA n []     = []
+mayoresA n (p:ps) = if ((edad p) > n)
+                     then p : mayoresA n ps
+                     else mayoresA n ps
+
+-- Funcion auxiliar de práctica 1.
+edad :: Persona -> Int
+edad (P n e) = e
+
+-- Dada una lista de personas devuelve el promedio de edad entre esas personas. Precondición: la lista al menos posee una persona.
+promedioEdad :: [Persona] -> Int
+promedioEdad (p:[]) = 
+promedioEdad (p:ps) = 
