@@ -159,5 +159,138 @@ edad (P n e) = e
 
 -- Dada una lista de personas devuelve el promedio de edad entre esas personas. Precondición: la lista al menos posee una persona.
 promedioEdad :: [Persona] -> Int
-promedioEdad (p:[]) = 
-promedioEdad (p:ps) = 
+promedioEdad [] = error "La lista no puede ser vacia."
+promedioEdad ps = div (sumatoriaEdades ps) (longitud ps)
+
+-- (Funcion auxiliar) Dada una lista de personas, devuelve la sumatoria de sus edades.
+sumatoriaEdades :: [Persona] -> Int
+sumatoriaEdades []     = 0
+sumatoriaEdades (p:ps) = edad p + sumatoriaEdades ps
+
+-- Dada una lista de personas devuelve la persona más vieja de la lista. Precondición: la lista al menos posee una persona.
+elMasViejo :: [Persona] -> Persona
+elMasViejo (p:[]) = p
+elMasViejo (p:ps) = if (esMayorQueLaOtra p (elMasViejo ps))
+                     then p
+                     else elMasViejo ps
+
+-- Funcion auxiliar de la práctica 1.
+esMayorQueLaOtra :: Persona -> Persona -> Bool
+esMayorQueLaOtra (P _ e1) (P _ e2) = e1 > e2
+
+-- 2 
+data TipoDePokemon = Agua | Fuego | Planta
+                     deriving Show
+data Pokemon = ConsPokemon TipoDePokemon Int
+               deriving Show
+data Entrenador = ConsEntrenador String [Pokemon]
+                  deriving Show
+
+-- Devuelve la cantidad de Pokémon que posee el entrenador.
+cantPokemon :: Entrenador -> Int
+cantPokemon (ConsEntrenador _ ps) = longitud ps
+
+-- Devuelve la cantidad de Pokémon de determinado tipo que posee el entrenador.
+cantPokemonDe :: TipoDePokemon -> Entrenador -> Int
+cantPokemonDe t (ConsEntrenador _ ps) = cantPokemonDe' t ps
+
+-- (Funcion auxiliar) Devuelve la cantidad de Pokémon de determinado tipo en una lista de Pokémon.
+cantPokemonDe' :: TipoDePokemon -> [Pokemon] -> Int
+cantPokemonDe' t []     = 0
+cantPokemonDe' t (p:ps) = if (sonMismoTipo t (tipoDePokemon p))
+                           then 1 + cantPokemonDe' t ps
+                           else cantPokemonDe' t ps
+
+-- (Funcion auxiliar) Retorna el tipo de un Pokémon.
+tipoDePokemon :: Pokemon -> TipoDePokemon
+tipoDePokemon (ConsPokemon t _) = t
+
+-- Funcion auxiliar de práctica 1.
+sonMismoTipo :: TipoDePokemon -> TipoDePokemon -> Bool
+sonMismoTipo Fuego Fuego   = True
+sonMismoTipo Agua Agua     = True
+sonMismoTipo Planta Planta = True
+sonMismoTipo _      _      = False
+
+-- Dados dos entrenadores, indica la cantidad de Pokemon de cierto tipo, que le ganarían a los Pokemon del segundo entrenador.
+losQueLeGanan :: TipoDePokemon -> Entrenador -> Entrenador -> Int
+losQueLeGanan t (ConsEntrenador _ ps1) (ConsEntrenador _ ps2) = losQueLeGanan' t ps1 ps2
+
+-- (Funcion auxiliar) Dados dos listas de Pokemon, indica la cantidad de Pokemon de cierto tipo,
+-- que le ganarian a los Pokemon de la segunda lista.
+losQueLeGanan' :: TipoDePokemon -> [Pokemon] -> [Pokemon] -> Int
+losQueLeGanan' t []     _   = 0
+losQueLeGanan' t _      []  = 0
+losQueLeGanan' t (p:ps) ps' = unoSi ((sonMismoTipo t (tipoDePokemon p)) && superaATodos p ps') + losQueLeGanan' t ps ps'
+
+-- (Funcion auxiliar) Dado un Bool, retorna 1 si es True, o 0 si es False.
+unoSi :: Bool -> Int
+unoSi True  = 1
+unoSi False = 0
+
+-- (Funcion auxiliar) Indica si un Pokemon supera a TODOS los Pokemon de una lista dada.
+superaATodos :: Pokemon -> [Pokemon] -> Bool
+superaATodos p' []     = True
+superaATodos p' (p:ps) = superaA p' p && superaATodos p' ps
+
+-- Funcion auxiliar de práctica 1.
+superaA :: Pokemon -> Pokemon -> Bool
+superaA (ConsPokemon t1 _) (ConsPokemon t2 _) = esTipoMasFuerte t1 t2
+
+-- Funcion auxiliar de práctica 1.
+esTipoMasFuerte :: TipoDePokemon -> TipoDePokemon -> Bool
+esTipoMasFuerte Agua Fuego   = True
+esTipoMasFuerte Fuego Planta = True
+esTipoMasFuerte Planta Agua  = True 
+esTipoMasFuerte _      _     = False
+
+-- Dado un entrenador, devuelve True si posee al menos un Pokémon de cada tipo posible.
+esMaestroPokemon :: Entrenador -> Bool
+esMaestroPokemon (ConsEntrenador _ ps) = hayTipo Fuego ps && hayTipo Agua ps && hayTipo Planta ps
+
+-- (Funcion auxiliar) Dada una lista de Pokémon y un TipoDePokemon, retorna True si hay al menos un Pokémon del tipo indicado.
+hayTipo :: TipoDePokemon -> [Pokemon] -> Bool
+hayTipo t []     = False
+hayTipo t (p:ps) = sonMismoTipo t (tipoDePokemon p) || hayTipo t ps
+
+-- 3
+data Seniority = Junior | SemiSenior | Senior
+                 deriving Show
+data Proyecto = ConsProyecto String
+                deriving Show
+data Rol = Developer Seniority Proyecto | Management Seniority Proyecto
+           deriving Show
+data Empresa = ConsEmpresa [Rol]
+               deriving Show
+
+-- Dada una empresa denota la lista de proyectos en los que trabaja, sin elementos repetidos.
+proyectos :: Empresa -> [Proyecto]
+proyectos (ConsEmpresa rs) = proyectos' rs
+
+-- (Funcion auxiliar) Dada una lista de roles denota una lista de proyectos en los que trabajan los roles, sin elementos repetidos.
+proyectos' :: [Rol] -> [Proyecto]
+proyectos' []     = []
+proyectos' (r:rs) = agregarProyectoSiNoEsta (proyectoDeRol r) (proyectos' rs)
+
+-- (Funcion auxiliar) Agrega a la lista un elemento si no esta presente en la lista.
+agregarProyectoSiNoEsta :: Proyecto -> [Proyecto] -> [Proyecto]
+agregarProyectoSiNoEsta p [] = [p]
+agregarProyectoSiNoEsta p ps = if (estaProyectoEnLaLista p ps)
+                                     then ps
+                                     else p : ps
+
+-- (Funcion auxiliar) Indica si un elemento se encuentra presente en una lista.
+estaProyectoEnLaLista :: Proyecto -> [Proyecto] -> Bool
+estaProyectoEnLaLista p' []     = False
+estaProyectoEnLaLista p' (p:ps) = (sonMismoProyecto p' p) || (estaProyectoEnLaLista p' ps)
+
+-- (Funcion auxiliar) Indica si dos proyectos son el mismo.
+sonMismoProyecto :: Proyecto -> Proyecto -> Bool
+sonMismoProyecto (ConsProyecto n) (ConsProyecto n') = n == n'
+
+-- (Funcion auxiliar) Retorna el proyecto de un rol.
+proyectoDeRol :: Rol -> Proyecto
+proyectoDeRol (Developer _ p)  = p 
+proyectoDeRol (Management _ p) = p
+
+
