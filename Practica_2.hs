@@ -293,4 +293,54 @@ proyectoDeRol :: Rol -> Proyecto
 proyectoDeRol (Developer _ p)  = p 
 proyectoDeRol (Management _ p) = p
 
+-- Dada una empresa indica la cantidad de desarrolladores senior que posee, que pertecen
+-- además a los proyectos dados por parámetro.
+losDevSenior :: Empresa -> [Proyecto] -> Int
+losDevSenior (ConsEmpresa rs) ps = losDevSenior' rs ps 
 
+-- (Funcion auxiliar) Dada una lista de roles indica la cantidad de desarrolladores senior que hay,
+-- que pertenecen a alguno de los proyectos dados por parámetro.
+losDevSenior' :: [Rol] -> [Proyecto] -> Int
+losDevSenior' []     ps = 0
+losDevSenior' (r:rs) ps = unoSi ((esDevSenior r) && (perteneceAProyectos r ps)) + losDevSenior' rs ps
+
+-- (Funcion auxiliar) Indica si un rol es senior.
+esDevSenior :: Rol -> Bool
+esDevSenior (Developer Senior _)  = True 
+esDevSenior _                     = False
+
+-- (Funcion auxiliar) Indica si un rol pertenece a alguno de los proyectos dados.
+perteneceAProyectos :: Rol -> [Proyecto] -> Bool
+perteneceAProyectos _ []      = False
+perteneceAProyectos r (p:ps)  = perteneceAProyecto r p || perteneceAProyectos r ps 
+
+-- (Funcion auxiliar) Indica si un rol pertenece al proyecto dado.
+perteneceAProyecto :: Rol -> Proyecto -> Bool
+perteneceAProyecto (Developer _ p) p'  = sonMismoProyecto p p'
+perteneceAProyecto (Management _ p) p' = sonMismoProyecto p p'
+
+-- Indica la cantidad de empleados que trabajan en alguno de los proyectos dados.
+cantQueTrabajanEn :: [Proyecto] -> Empresa -> Int
+cantQueTrabajanEn ps (ConsEmpresa rs) = cantQueTrabajanEn' ps rs
+
+-- (Funcion auxiliar) Indica la cantidad de roles que trabajan en alguno de los proyectos dados.
+cantQueTrabajanEn' :: [Proyecto] -> [Rol] -> Int
+cantQueTrabajanEn' ps []     = 0 
+cantQueTrabajanEn' ps (r:rs) = unoSi (perteneceAProyectos r ps) + cantQueTrabajanEn' ps rs 
+
+-- Devuelve una lista de pares que representa a los proyectos (sin repetir) junto con su 
+-- cantidad de personas involucradas.
+asignadosPorProyecto :: Empresa -> [(Proyecto, Int)]
+asignadosPorProyecto (ConsEmpresa rs) = asignadosPorProyecto' rs
+
+-- (Funcion auxiliar) Devuelve una lista de pares que representa a los proyectos (sin repetir) junto con su 
+-- cantidad de personas involucradas.
+asignadosPorProyecto' :: [Rol] -> [(Proyecto, Int)]
+asignadosPorProyecto' []     = []
+asignadosPorProyecto' (r:rs) = agregarProyectoATuplas (proyectoDeRol r) (asignadosPorProyecto' rs)
+
+agregarProyectoATuplas :: Proyecto -> [(Proyecto, Int)] -> [(Proyecto, Int)]
+agregarProyectoATuplas p []           = [(p, 1)]
+agregarProyectoATuplas p ((p', n):ts) = if (sonMismoProyecto p p')
+                                         then ((p', (n+1)):ts)
+                                         else (p',n) : agregarProyectoATuplas p ts
