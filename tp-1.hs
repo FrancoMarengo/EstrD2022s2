@@ -90,37 +90,6 @@ vieneDespues Viernes   d = vieneAntesDeViernes d
 vieneDespues Sabado    d = vieneAntesDeSabado d
 vieneDespues Domingo   d = vieneAntesDeDomingo d
 
-vieneAntesDeMartes :: DiaDeSemana -> Bool
-vieneAntesDeMartes Lunes = True
-vieneAntesDeMartes _     = False
-
-vieneAntesDeMiercoles :: DiaDeSemana -> Bool
-vieneAntesDeMiercoles Lunes  = True
-vieneAntesDeMiercoles Martes = True
-vieneAntesDeMiercoles _      = False
-
-vieneAntesDeJueves :: DiaDeSemana -> Bool
-vieneAntesDeJueves Jueves  = False
-vieneAntesDeJueves Viernes = False
-vieneAntesDeJueves Sabado  = False
-vieneAntesDeJueves Domingo = False
-vieneAntesDeJueves _       = True
-
-vieneAntesDeViernes :: DiaDeSemana -> Bool
-vieneAntesDeViernes Viernes = False
-vieneAntesDeViernes Sabado  = False
-vieneAntesDeViernes Domingo = False
-vieneAntesDeViernes _       = True
-
-vieneAntesDeSabado :: DiaDeSemana -> Bool
-vieneAntesDeSabado Sabado  = False
-vieneAntesDeSabado Domingo = False
-vieneAntesDeSabado _       = True
-
-vieneAntesDeDomingo :: DiaDeSemana -> Bool
-vieneAntesDeDomingo Domingo = False
-vieneAntesDeDomingo _       = True
-
 -- d)
 estaEnElMedio :: DiaDeSemana -> Bool
 estaEnElMedio Lunes   = False
@@ -173,14 +142,6 @@ laQueEsMayor :: Persona -> Persona -> Persona
 laQueEsMayor p1 p2 = if (esMayorQueLaOtra p1 p2) 
                       then p1
                       else p2
-
--- caso en el que ambas sean de la misma edad retorne error 
-laQueEsMayor' :: Persona -> Persona -> Persona 
-laQueEsMayor' p1 p2 = if (tienenLaMismaEdad p1 p2) 
-                      then error "Ambas personas tienen la misma edad"
-                      else if (esMayorQueLaOtra p1 p2)
-                            then p1
-                            else p2
 
 tienenLaMismaEdad :: Persona -> Persona -> Bool
 tienenLaMismaEdad (P _ e1) (P _ e2) = e1 == e2
