@@ -26,7 +26,7 @@ maxDelPar (x, y) = if (x > y)
 
 -- 2 
 -- sumar (maxDelPar (divisionYResto 49 7)) (sucesor 2)
--- sucesor (maxDelPar (divisionYResto 81 (sumar 6)))
+-- sucesor (maxDelPar (divisionYResto 81 (sumar 6 3)))
 -- maxDelPar (divisionYResto 100 (sumar 7 (sucesor 2)))
 -- sumar (maxDelPar (-20, -41)) (maxDelPar (divisionYResto (sucesor 149) 5))
 
