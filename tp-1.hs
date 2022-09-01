@@ -145,9 +145,8 @@ yTambien True  b = b
 
 -- d)
 oBien :: Bool -> Bool -> Bool
-oBien True _    = True
-oBien _    True = True
-oBien _    _    = False
+oBien False b     = b
+oBien b     False = b
 
 -- Registros 
 -- 1 
