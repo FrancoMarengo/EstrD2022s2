@@ -135,13 +135,13 @@ negar True  = False
 
 -- b)
 implica :: Bool -> Bool -> Bool
-implica True False = False
-implica _    _     = True
+implica True b = b
+implica _    _ = True
 
 -- c)
 yTambien :: Bool -> Bool -> Bool
-yTambien True True = True
-yTambien _    _    = False
+yTambien False _ = False
+yTambien True  b = b
 
 -- d)
 oBien :: Bool -> Bool -> Bool
