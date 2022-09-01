@@ -166,14 +166,14 @@ esTipoMasFuerte Planta Agua  = True
 esTipoMasFuerte _      _     = False 
 
 cantidadDePokemonDe :: TipoDePokemon -> Entrenador -> Int
-cantidadDePokemonDe t (E _ p1 p2) = cantidadDePokemonDe' t p1 p2
+cantidadDePokemonDe t (E _ p1 p2) = unoSi(esPokemonDeTipo t p1) + unoSi(esPokemonDeTipo t p2)
 
-cantidadDePokemonDe' :: TipoDePokemon -> Pokemon -> Pokemon -> Int
-cantidadDePokemonDe' t (PK tp1 _) (PK tp2 _) = if (sonMismoTipo t tp1 && sonMismoTipo t tp2)
-                                                then 2
-                                                else if (sonMismoTipo t tp1 || sonMismoTipo t tp2)
-                                                      then 1
-                                                      else 0
+unoSi :: Bool -> Int
+unoSi True = 1
+unoSi _    = 0
+
+esPokemonDeTipo :: TipoDePokemon -> Pokemon -> Bool
+esPokemonDeTipo t (PK t' _) = sonMismoTipo t t'
 
 sonMismoTipo :: TipoDePokemon -> TipoDePokemon -> Bool
 sonMismoTipo Fuego Fuego   = True
