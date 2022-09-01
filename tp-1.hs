@@ -26,7 +26,7 @@ maxDelPar (x, y) = if (x > y)
 
 -- 2 
 -- sumar (maxDelPar (divisionYResto 49 7)) (sucesor 2)
--- sucesor (maxDelPar (divisionYResto 81 (sumar 6)))
+-- sucesor (maxDelPar (divisionYResto 81 (sumar 6 3)))
 -- maxDelPar (divisionYResto 100 (sumar 7 (sucesor 2)))
 -- sumar (maxDelPar (-20, -41)) (maxDelPar (divisionYResto (sucesor 149) 5))
 
@@ -82,44 +82,16 @@ empiezaConM _         = False
 
 -- c)
 vieneDespues :: DiaDeSemana -> DiaDeSemana -> Bool
-vieneDespues Lunes     _ = False
-vieneDespues Martes    d = vieneAntesDeMartes d
-vieneDespues Miercoles d = vieneAntesDeMiercoles d
-vieneDespues Jueves    d = vieneAntesDeJueves d
-vieneDespues Viernes   d = vieneAntesDeViernes d 
-vieneDespues Sabado    d = vieneAntesDeSabado d
-vieneDespues Domingo   d = vieneAntesDeDomingo d
+vieneDespues d1 d2 = (indiceDeDia d1) > (indiceDeDia d2)
 
-vieneAntesDeMartes :: DiaDeSemana -> Bool
-vieneAntesDeMartes Lunes = True
-vieneAntesDeMartes _     = False
-
-vieneAntesDeMiercoles :: DiaDeSemana -> Bool
-vieneAntesDeMiercoles Lunes  = True
-vieneAntesDeMiercoles Martes = True
-vieneAntesDeMiercoles _      = False
-
-vieneAntesDeJueves :: DiaDeSemana -> Bool
-vieneAntesDeJueves Jueves  = False
-vieneAntesDeJueves Viernes = False
-vieneAntesDeJueves Sabado  = False
-vieneAntesDeJueves Domingo = False
-vieneAntesDeJueves _       = True
-
-vieneAntesDeViernes :: DiaDeSemana -> Bool
-vieneAntesDeViernes Viernes = False
-vieneAntesDeViernes Sabado  = False
-vieneAntesDeViernes Domingo = False
-vieneAntesDeViernes _       = True
-
-vieneAntesDeSabado :: DiaDeSemana -> Bool
-vieneAntesDeSabado Sabado  = False
-vieneAntesDeSabado Domingo = False
-vieneAntesDeSabado _       = True
-
-vieneAntesDeDomingo :: DiaDeSemana -> Bool
-vieneAntesDeDomingo Domingo = False
-vieneAntesDeDomingo _       = True
+indiceDeDia :: DiaDeSemana -> Int
+indiceDeDia Lunes     = 1
+indiceDeDia Martes    = 2 
+indiceDeDia Miercoles = 3 
+indiceDeDia Jueves    = 4
+indiceDeDia Viernes   = 5
+indiceDeDia Sabado    = 6
+indiceDeDia Domingo   = 7
 
 -- d)
 estaEnElMedio :: DiaDeSemana -> Bool
@@ -135,19 +107,18 @@ negar True  = False
 
 -- b)
 implica :: Bool -> Bool -> Bool
-implica True False = False
-implica _    _     = True
+implica True b = b
+implica _    _ = True
 
 -- c)
 yTambien :: Bool -> Bool -> Bool
-yTambien True True = True
-yTambien _    _    = False
+yTambien False _ = False
+yTambien True  b = b
 
 -- d)
 oBien :: Bool -> Bool -> Bool
-oBien True _    = True
-oBien _    True = True
-oBien _    _    = False
+oBien False b = b
+oBien True  _ = True
 
 -- Registros 
 -- 1 
@@ -175,14 +146,6 @@ laQueEsMayor p1 p2 = if (esMayorQueLaOtra p1 p2)
                       then p1
                       else p2
 
--- caso en el que ambas sean de la misma edad retorne error 
-laQueEsMayor' :: Persona -> Persona -> Persona 
-laQueEsMayor' p1 p2 = if (tienenLaMismaEdad p1 p2) 
-                      then error "Ambas personas tienen la misma edad"
-                      else if (esMayorQueLaOtra p1 p2)
-                            then p1
-                            else p2
-
 tienenLaMismaEdad :: Persona -> Persona -> Bool
 tienenLaMismaEdad (P _ e1) (P _ e2) = e1 == e2
 
@@ -206,14 +169,14 @@ esTipoMasFuerte Planta Agua  = True
 esTipoMasFuerte _      _     = False 
 
 cantidadDePokemonDe :: TipoDePokemon -> Entrenador -> Int
-cantidadDePokemonDe t (E _ p1 p2) = cantidadDePokemonDe' t p1 p2
+cantidadDePokemonDe t (E _ p1 p2) = unoSi(esPokemonDeTipo t p1) + unoSi(esPokemonDeTipo t p2)
 
-cantidadDePokemonDe' :: TipoDePokemon -> Pokemon -> Pokemon -> Int
-cantidadDePokemonDe' t (PK tp1 _) (PK tp2 _) = if (sonMismoTipo t tp1 && sonMismoTipo t tp2)
-                                                then 2
-                                                else if (sonMismoTipo t tp1 || sonMismoTipo t tp2)
-                                                      then 1
-                                                      else 0
+unoSi :: Bool -> Int
+unoSi True = 1
+unoSi _    = 0
+
+esPokemonDeTipo :: TipoDePokemon -> Pokemon -> Bool
+esPokemonDeTipo t (PK t' _) = sonMismoTipo t t'
 
 sonMismoTipo :: TipoDePokemon -> TipoDePokemon -> Bool
 sonMismoTipo Fuego Fuego   = True
