@@ -82,13 +82,16 @@ empiezaConM _         = False
 
 -- c)
 vieneDespues :: DiaDeSemana -> DiaDeSemana -> Bool
-vieneDespues Lunes     _ = False
-vieneDespues Martes    d = vieneAntesDeMartes d
-vieneDespues Miercoles d = vieneAntesDeMiercoles d
-vieneDespues Jueves    d = vieneAntesDeJueves d
-vieneDespues Viernes   d = vieneAntesDeViernes d 
-vieneDespues Sabado    d = vieneAntesDeSabado d
-vieneDespues Domingo   d = vieneAntesDeDomingo d
+vieneDespues d1 d2 = (indiceDeDia d1) > (indiceDeDia d2)
+
+indiceDeDia :: DiaDeSemana -> Int
+indiceDeDia Lunes     = 1
+indiceDeDia Martes    = 2 
+indiceDeDia Miercoles = 3 
+indiceDeDia Jueves    = 4
+indiceDeDia Viernes   = 5
+indiceDeDia Sabado    = 6
+indiceDeDia Domingo   = 7
 
 -- d)
 estaEnElMedio :: DiaDeSemana -> Bool
