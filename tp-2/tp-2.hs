@@ -90,9 +90,13 @@ reversa (x:xs) = agregarAlFinal (reversa xs) x
 zipMaximos :: [Int] -> [Int] -> [Int]
 zipMaximos ns []            = ns
 zipMaximos [] ns2           = ns2
-zipMaximos (n:ns) (n2:ns2)  = if (n > n2) 
-                               then n : zipMaximos ns ns2
-                               else n2 : zipMaximos ns ns2
+zipMaximos (n:ns) (n2:ns2)  = maxDelPar(n, n2) : zipMaximos ns ns2
+
+-- Funcion auxiliar de practica 1.
+maxDelPar :: (Int,Int) -> Int
+maxDelPar (x, y) = if (x > y) 
+                    then x
+                    else y
 
 -- 15
 -- Dada una lista devuelve el mínimo
