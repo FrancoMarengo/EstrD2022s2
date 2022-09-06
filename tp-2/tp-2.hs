@@ -211,9 +211,7 @@ cantPokemonDe t (ConsEntrenador _ ps) = cantPokemonDe' t ps
 -- (Funcion auxiliar) Devuelve la cantidad de Pokémon de determinado tipo en una lista de Pokémon.
 cantPokemonDe' :: TipoDePokemon -> [Pokemon] -> Int
 cantPokemonDe' t []     = 0
-cantPokemonDe' t (p:ps) = if (sonMismoTipo t (tipoDePokemon p))
-                           then 1 + cantPokemonDe' t ps
-                           else cantPokemonDe' t ps
+cantPokemonDe' t (p:ps) = unoSi(sonMismoTipo t (tipoDePokemon p)) + cantPokemonDe' t ps
 
 -- (Funcion auxiliar) Retorna el tipo de un Pokémon.
 tipoDePokemon :: Pokemon -> TipoDePokemon
