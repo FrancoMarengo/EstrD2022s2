@@ -118,7 +118,9 @@ factorial n = n * factorial (n-1)
 -- Si el número es inferior a 1, devuelve la lista vacía.
 cuentaRegresiva :: Int -> [Int]
 cuentaRegresiva 0 = []
-cuentaRegresiva n = n : cuentaRegresiva (n-1)
+cuentaRegresiva n = if (n<0)
+                     then []
+                     else n : cuentaRegresiva (n-1)
 
 -- 3
 -- Dado un número n y un elemento e devuelve una lista en la que el elemento e repite n veces.
