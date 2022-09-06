@@ -104,6 +104,12 @@ elMinimo (x:xs) = if x < (elMinimo xs)
                    then x
                    else elMinimo xs
 
+-- (Funcion auxiliar) Dado dos elementos devuelve el mínimo.
+minimo :: Ord a => a -> a -> a
+minimo x y = if (x > y)
+              then y
+              else x
+
 -- Recursion sobre numeros
 -- 1
 -- Dado un número n se devuelve la multiplicación de este número y todos sus anteriores hasta llegar a 0. 
@@ -172,9 +178,13 @@ sumatoriaEdades (p:ps) = edad p + sumatoriaEdades ps
 -- Dada una lista de personas devuelve la persona más vieja de la lista. Precondición: la lista al menos posee una persona.
 elMasViejo :: [Persona] -> Persona
 elMasViejo (p:[]) = p
-elMasViejo (p:ps) = if (esMayorQueLaOtra p (elMasViejo ps))
-                     then p
-                     else elMasViejo ps
+elMasViejo (p:ps) = laQueEsMayor p (elMasViejo ps)
+
+-- Funcion auxiliar de práctica 1.
+laQueEsMayor :: Persona -> Persona -> Persona
+laQueEsMayor p1 p2 = if (esMayorQueLaOtra p1 p2) 
+                      then p1
+                      else p2
 
 -- Funcion auxiliar de la práctica 1.
 esMayorQueLaOtra :: Persona -> Persona -> Bool
