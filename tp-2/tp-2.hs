@@ -100,9 +100,7 @@ zipMaximos (n:ns) (n2:ns2)  = if (n > n2)
 elMinimo :: Ord a => [a] -> a
 elMinimo []     = error "La lista no puede ser vacia."
 elMinimo (x:[]) = x
-elMinimo (x:xs) = if x < (elMinimo xs)
-                   then x
-                   else elMinimo xs
+elMinimo (x:xs) = minimo x (elMinimo xs)
 
 -- (Funcion auxiliar) Dado dos elementos devuelve el mínimo.
 minimo :: Ord a => a -> a -> a
