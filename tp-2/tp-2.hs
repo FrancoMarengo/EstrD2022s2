@@ -90,9 +90,13 @@ reversa (x:xs) = agregarAlFinal (reversa xs) x
 zipMaximos :: [Int] -> [Int] -> [Int]
 zipMaximos ns []            = ns
 zipMaximos [] ns2           = ns2
-zipMaximos (n:ns) (n2:ns2)  = if (n > n2) 
-                               then n : zipMaximos ns ns2
-                               else n2 : zipMaximos ns ns2
+zipMaximos (n:ns) (n2:ns2)  = maxDelPar(n, n2) : zipMaximos ns ns2
+
+-- Funcion auxiliar de practica 1.
+maxDelPar :: (Int,Int) -> Int
+maxDelPar (x, y) = if (x > y) 
+                    then x
+                    else y
 
 -- 15
 -- Dada una lista devuelve el mínimo
@@ -100,9 +104,13 @@ zipMaximos (n:ns) (n2:ns2)  = if (n > n2)
 elMinimo :: Ord a => [a] -> a
 elMinimo []     = error "La lista no puede ser vacia."
 elMinimo (x:[]) = x
-elMinimo (x:xs) = if x < (elMinimo xs)
-                   then x
-                   else elMinimo xs
+elMinimo (x:xs) = minimo x (elMinimo xs)
+
+-- (Funcion auxiliar) Dado dos elementos devuelve el mínimo.
+minimo :: Ord a => a -> a -> a
+minimo x y = if (x > y)
+              then y
+              else x
 
 -- Recursion sobre numeros
 -- 1
@@ -118,7 +126,9 @@ factorial n = n * factorial (n-1)
 -- Si el número es inferior a 1, devuelve la lista vacía.
 cuentaRegresiva :: Int -> [Int]
 cuentaRegresiva 0 = []
-cuentaRegresiva n = n : cuentaRegresiva (n-1)
+cuentaRegresiva n = if (n<0)
+                     then []
+                     else n : cuentaRegresiva (n-1)
 
 -- 3
 -- Dado un número n y un elemento e devuelve una lista en la que el elemento e repite n veces.
@@ -170,9 +180,13 @@ sumatoriaEdades (p:ps) = edad p + sumatoriaEdades ps
 -- Dada una lista de personas devuelve la persona más vieja de la lista. Precondición: la lista al menos posee una persona.
 elMasViejo :: [Persona] -> Persona
 elMasViejo (p:[]) = p
-elMasViejo (p:ps) = if (esMayorQueLaOtra p (elMasViejo ps))
-                     then p
-                     else elMasViejo ps
+elMasViejo (p:ps) = laQueEsMayor p (elMasViejo ps)
+
+-- Funcion auxiliar de práctica 1.
+laQueEsMayor :: Persona -> Persona -> Persona
+laQueEsMayor p1 p2 = if (esMayorQueLaOtra p1 p2) 
+                      then p1
+                      else p2
 
 -- Funcion auxiliar de la práctica 1.
 esMayorQueLaOtra :: Persona -> Persona -> Bool
@@ -197,9 +211,7 @@ cantPokemonDe t (ConsEntrenador _ ps) = cantPokemonDe' t ps
 -- (Funcion auxiliar) Devuelve la cantidad de Pokémon de determinado tipo en una lista de Pokémon.
 cantPokemonDe' :: TipoDePokemon -> [Pokemon] -> Int
 cantPokemonDe' t []     = 0
-cantPokemonDe' t (p:ps) = if (sonMismoTipo t (tipoDePokemon p))
-                           then 1 + cantPokemonDe' t ps
-                           else cantPokemonDe' t ps
+cantPokemonDe' t (p:ps) = unoSi(sonMismoTipo t (tipoDePokemon p)) + cantPokemonDe' t ps
 
 -- (Funcion auxiliar) Retorna el tipo de un Pokémon.
 tipoDePokemon :: Pokemon -> TipoDePokemon
