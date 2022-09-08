@@ -110,3 +110,79 @@ cantTesorosEntre n1 0 c (Cofre obs c) = 0
 cantTesorosEntre n1 n2 (Fin)          = cantTesorosEntre (n1-1) (n2-1) c
 cantTesorosEntre n1 n2 (Nada c)       = cantTesorosEntre (n1-1) (n2-1) c
 cantTesorosEntre n1 n2 (Cofre obs c)  = cantTesorosEntre (n1-1) (n2-1) c
+
+-- Tipos arbóreos
+-- 2.1
+data Tree a = EmptyT | NodeT a (Tree a) (Tree a)
+            deriving Show
+
+-- 1
+-- Dado un árbol binario de enteros devuelve la suma entre sus elementos.
+sumarT :: Tree Int -> Int
+sumarT EmptyT          = 0
+sumarT (NodeT n t1 t2) = n + sumarT t1 + sumarT t2
+
+-- 2
+-- Dado un árbol binario devuelve su cantidad de elementos, es decir, el tamaño del árbol (size en inglés).
+sizeT :: Tree a -> Int
+sizeT EmptyT          = 0
+sizeT (NodeT _ t1 t2) = 1 + sizeT t1 + sizeT t2
+
+-- 3
+-- Dado un árbol de enteros devuelve un árbol con el doble de cada número.
+mapDobleT :: Tree Int -> Tree Int
+mapDobleT EmptyT          = EmptyT
+mapDobleT (NodeT n t1 t2) = (NodeT (n*2) (mapDobleT t1) (mapDobleT t2))
+
+-- 4
+-- Dados un elemento y un árbol binario devuelve True si existe un elemento igual a ese en el árbol.
+perteneceT :: Eq a => a -> Tree a -> Bool
+perteneceT x EmptyT          = False 
+perteneceT x (NodeT y t1 t2) = x == y || perteneceT x t1 || perteneceT x t2 
+
+-- 5
+-- Dados un elemento e y un árbol binario devuelve la cantidad de elementos del árbol que son iguales a e
+aparicionesT :: Eq a => a -> Tree a -> Int
+aparicionesT x EmptyT          = 0
+aparicionesT x (NodeT y t1 t2) = unoSi(x==y) + (aparicionesT x t1) + (aparicionesT x t2)
+
+-- 6
+-- Dado un árbol devuelve los elementos que se encuentran en sus hojas.
+leaves :: Tree a -> [a]
+leaves (NodeT x EmptyT EmptyT) = [x]
+leaves (NodeT _ t1 t2)         = leaves t1 ++ leaves t2 
+
+-- 7
+-- Dado un árbol devuelve su altura.
+heightT :: Tree a -> Int
+heightT EmptyT          = 0 
+heightT (NodeT _ t1 t2) = 1 + max (heightT t1) (heightT t2)
+
+-- 8
+-- Dado un árbol devuelve el árbol resultante de intercambiar el hijo izquierdo con el derecho, en cada nodo del árbol.
+mirrorT :: Tree a -> Tree a
+mirrorT EmptyT          = EmptyT
+mirrorT (NodeT x t1 t2) = (NodeT x (mirrorT t2) (mirrorT t1)) 
+
+-- 9
+-- Dado un árbol devuelve una lista que representa el resultado de recorrerlo en modo in-order.
+toList :: Tree a -> [a]
+toList EmptyT          = []
+toList (NodeT x t1 t2) = (agregarAlFinal (toList t1) x) ++ (toList t2)
+
+-- Funcion auxiliar practica 2.
+agregarAlFinal :: [a] -> a -> [a]
+agregarAlFinal [] e     = [e]
+agregarAlFinal (x:xs) e = x : agregarAlFinal xs e
+
+-- 10 
+-- Dados un número n y un árbol devuelve una lista con los nodos de nivel n. El nivel de un nodo es
+--  la distancia que hay de la raíz hasta él. La distancia de la raiz a sí misma es 0, y la
+-- distancia de la raiz a uno de sus hijos es 1.
+levelN :: Int -> Tree a -> [a]
+levelN _ EmptyT          = []
+levelN 0 (NodeT x t1 t2) = [x]
+levelN n (NodeT x t1 t2) = levelN (n-1) t1 ++ levelN (n-1) t2
+
+-- 11
+-- Dado un árbol devuelve una lista de listas en la que cada elemento representa un nivel de dicho árbol.
