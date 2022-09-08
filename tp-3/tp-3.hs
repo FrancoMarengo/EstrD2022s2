@@ -73,28 +73,29 @@ pasosHastaTesoro (Cofre obs c) = if hayTesoro' obs
 -- Indica si hay un tesoro en una cierta cantidad exacta de pasos. Por ejemplo, si el número de
 -- pasos es 5, indica si hay un tesoro en 5 pasos.
 hayTesoroEn :: Int -> Camino -> Bool
-hayTesoroEn 0 _             = False 
-hayTesoroEn n (Fin)         = False 
+hayTesoroEn 0 c             = hayTesoroEnTramo c
+hayTesoroEn n (Fin)         = False
 hayTesoroEn n (Nada c)      = hayTesoroEn (n-1) c
-hayTesoroEn n (Cofre obs c) = hayTesoro' obs || hayTesoroEn (n-1) c
+hayTesoroEn n (Cofre obs c) = hayTesoroEn (n-1) c
+
+--(Funcion auxiliar) Indica si hay al menos un tesoro en el tramo de camino indicado.
+hayTesoroEnTramo :: Camino -> Bool
+hayTesoroEnTramo (Cofre obs _) = hayTesoro' obs
+hayTesoroEnTramo _             = False 
 
 -- Indica si hay al menos “n” tesoros en el camino.
 alMenosNTesoros :: Int -> Camino -> Bool
 alMenosNTesoros 0 _             = True
 alMenosNTesoros n (Fin)         = False
 alMenosNTesoros n (Nada c)      = alMenosNTesoros n c
-alMenosNTesoros n (Cofre obs c) = if hayTesoro' obs
-                                   then alMenosNTesoros (tesorosFaltantesParaN n obs) c
-                                   else alMenosNTesoros n c
+alMenosNTesoros n (Cofre obs c) = 
+    let tesoros = cantTesorosEn obs in
+        tesoros >= n || alMenosNTesoros (n - tesoros) c 
 
--- (Funcion auxiliar) Retorna la cantidad de tesoros que faltan para llegar a "n" cantidad de tesoros, 
--- restando los tesoros de la lista de objetos dada.
-tesorosFaltantesParaN :: Int -> [Objeto] -> Int
-tesorosFaltantesParaN 0 _        = 0
-tesorosFaltantesParaN n []       = n
-tesorosFaltantesParaN n (ob:obs) = if esTesoro ob 
-                                    then tesorosFaltantesParaN (n-1) obs
-                                    else tesorosFaltantesParaN n obs 
+-- (Funcion auxiliar) Retorna la cantidad de tesoros en una lista de objetos.
+cantTesorosEn :: [Objeto] -> Int
+cantTesorosEn []       = 0
+cantTesorosEn (ob:obs) = unoSi(esTesoro ob) + cantTesorosEn obs
 
 -- Dado un rango de pasos, indica la cantidad de tesoros que hay en ese rango. Por ejemplo, si el rango es 3 y 5, 
 -- indica la cantidad de tesoros que hay entre hacer 3 pasos y hacer 5. Están incluidos tanto 3 como 5 en el resultado.
