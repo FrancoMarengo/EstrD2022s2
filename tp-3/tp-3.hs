@@ -84,6 +84,7 @@ hayTesoroEnTramo (Cofre obs _) = hayTesoro' obs
 hayTesoroEnTramo _             = False 
 
 -- Indica si hay al menos “n” tesoros en el camino.
+-- PRECOND: La cantidad "n" de tesoros requeridos no puede ser negativa.
 alMenosNTesoros :: Int -> Camino -> Bool
 alMenosNTesoros 0 _             = True
 alMenosNTesoros n (Fin)         = False
