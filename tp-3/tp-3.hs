@@ -98,7 +98,7 @@ cantTesorosEn :: [Objeto] -> Int
 cantTesorosEn []       = 0
 cantTesorosEn (ob:obs) = unoSi(esTesoro ob) + cantTesorosEn obs
 
--- Dado un rango de pasos, indica la cantidad de tesoros que hay en ese rango. Por ejemplo, si el rango es 3 y 5, 
+{- Dado un rango de pasos, indica la cantidad de tesoros que hay en ese rango. Por ejemplo, si el rango es 3 y 5, 
 -- indica la cantidad de tesoros que hay entre hacer 3 pasos y hacer 5. Están incluidos tanto 3 como 5 en el resultado.
 cantTesorosEntre :: Int -> Int -> Camino -> Int -- Sin terminar
 cantTesorosEntre 0 n2 c (Fin)         = 0
@@ -110,7 +110,7 @@ cantTesorosEntre n1 0 c (Cofre obs c) = 0
 cantTesorosEntre n1 n2 (Fin)          = cantTesorosEntre (n1-1) (n2-1) c
 cantTesorosEntre n1 n2 (Nada c)       = cantTesorosEntre (n1-1) (n2-1) c
 cantTesorosEntre n1 n2 (Cofre obs c)  = cantTesorosEntre (n1-1) (n2-1) c
-
+-}
 -- Tipos arbóreos
 -- 2.1
 data Tree a = EmptyT | NodeT a (Tree a) (Tree a)
@@ -186,3 +186,17 @@ levelN n (NodeT x t1 t2) = levelN (n-1) t1 ++ levelN (n-1) t2
 
 -- 11
 -- Dado un árbol devuelve una lista de listas en la que cada elemento representa un nivel de dicho árbol.
+listPerLevel :: Tree a -> [[a]]
+listPerLevel EmptyT          = []
+listPerLevel (NodeT x t1 t2) = [x] : zipListas (listPerLevel t1) (listPerLevel t2)
+
+-- (Funcion auxiliar) Dadas dos listas de listas, hace un append de la lista en posición n de la primer lista con la lista en posición n
+-- de la segunda lista.
+zipListas :: [[a]] -> [[a]] -> [[a]]
+zipListas []  yss           = yss
+zipListas xss []            = xss
+zipListas (xs:xss) (ys:yss) = (xs++ys) : zipListas xss yss
+
+-- 12
+-- Devuelve los elementos de la rama más larga del árbol
+ ramaMasLarga :: Tree a -> [a]
