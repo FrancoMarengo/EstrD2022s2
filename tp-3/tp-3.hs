@@ -199,4 +199,69 @@ zipListas (xs:xss) (ys:yss) = (xs++ys) : zipListas xss yss
 
 -- 12
 -- Devuelve los elementos de la rama más larga del árbol
- ramaMasLarga :: Tree a -> [a]
+ramaMasLarga :: Tree a -> [a]
+ramaMasLarga EmptyT          = []
+ramaMasLarga (NodeT x t1 t2) = if (heightT t1 > heightT t2)
+                                then x : ramaMasLarga t1
+                                else x : ramaMasLarga t2
+
+-- 13
+-- Dado un árbol devuelve todos los caminos, es decir, los caminos desde la raiz hasta las hojas.
+todosLosCaminos :: Tree a -> [[a]]
+todosLosCaminos EmptyT                  = []
+todosLosCaminos (NodeT x EmptyT EmptyT) = [[x]] 
+todosLosCaminos (NodeT x t1 t2)         = (consATodasLasListas x (todosLosCaminos t1)) ++ (consATodasLasListas x (todosLosCaminos t2))
+
+-- (Funcion auxiliar) Dado un elemento y una lista de listas, agrega el elemento a todas las listas dentro de la lista.
+consATodasLasListas :: a -> [[a]] -> [[a]]
+consATodasLasListas x []       = []
+consATodasLasListas x (ys:yss) = (x : ys) : (consATodasLasListas x yss)
+
+-- Expresiones aritméticas
+data ExpA = Valor Int
+          | Sum ExpA ExpA
+          | Prod ExpA ExpA
+          | Neg ExpA    
+          deriving Show
+
+-- 1
+-- Dada una expresión aritmética devuelve el resultado evaluarla.
+eval :: ExpA -> Int
+eval (Valor n)    = n
+eval (Sum e1 e2)  = (eval e1) + (eval e2)
+eval (Prod e1 e2) = (eval e1) * (eval e2)
+eval (Neg e1)     = (eval e1) * (-1) 
+
+-- 2
+{- 
+Dada una expresión aritmética, la simplifica según los siguientes criterios (descritos utilizando notación matemática convencional):
+a) 0 + x = x + 0 = x
+b) 0 * x = x * 0 = 0
+c) 1 * x = x * 1 = x
+d) - (- x) = x
+   Neg (Neg (Valor 2) = (Valor 2)
+-}
+simplificar :: ExpA -> ExpA
+simplificar (Sum e1 e2)  = simplificarSum e1 e2
+simplificar (Prod e1 e2) = simplificarProd e1 e2
+simplificar (Neg e1)     = simplificarNeg e1
+
+simplificarSum :: ExpA -> ExpA -> ExpA
+simplificarSum e1 e2 = if (eval e1 == 0)
+                        then e2
+                        else if (eval e2 == 0)
+                         then e1
+                         else (Sum e1 e2) 
+
+simplificarProd :: ExpA -> ExpA -> ExpA 
+simplificarProd e1 e2 = if (eval e1 == 0 || eval e2 == 0)
+                         then (Valor 0)
+                          else if (eval e1 == 1)
+                           then e2
+                           else if (eval e2 == 1)
+                            then e1
+                            else (Prod e1 e2) 
+
+
+simplificarNeg :: ExpA -> ExpA
+simplificarNeg e = e
