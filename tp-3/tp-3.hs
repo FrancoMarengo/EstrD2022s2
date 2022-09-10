@@ -98,19 +98,27 @@ cantTesorosEn :: [Objeto] -> Int
 cantTesorosEn []       = 0
 cantTesorosEn (ob:obs) = unoSi(esTesoro ob) + cantTesorosEn obs
 
-{- Dado un rango de pasos, indica la cantidad de tesoros que hay en ese rango. Por ejemplo, si el rango es 3 y 5, 
+-- Dado un rango de pasos, indica la cantidad de tesoros que hay en ese rango. Por ejemplo, si el rango es 3 y 5, 
 -- indica la cantidad de tesoros que hay entre hacer 3 pasos y hacer 5. Están incluidos tanto 3 como 5 en el resultado.
-cantTesorosEntre :: Int -> Int -> Camino -> Int -- Sin terminar
-cantTesorosEntre 0 n2 c (Fin)         = 0
-cantTesorosEntre 0 n2 c (Nada c)      = 0
-cantTesorosEntre 0 n2 c (Cofre obs c) = 0
-cantTesorosEntre n1 0 c (Fin)         = 0
-cantTesorosEntre n1 0 c (Nada c)      = 0
-cantTesorosEntre n1 0 c (Cofre obs c) = 0
-cantTesorosEntre n1 n2 (Fin)          = cantTesorosEntre (n1-1) (n2-1) c
-cantTesorosEntre n1 n2 (Nada c)       = cantTesorosEntre (n1-1) (n2-1) c
-cantTesorosEntre n1 n2 (Cofre obs c)  = cantTesorosEntre (n1-1) (n2-1) c
--}
+-- PRECOND: El rango de pasos indicado debe estar dentro de los limites de la cantidad de pasos posibles en el camino dado.
+cantTesorosEntre :: Int -> Int -> Camino -> Int 
+cantTesorosEntre 1  1  c = cantTesorosEnTramo c 
+cantTesorosEntre 1  n2 c = cantTesorosEnTramo c + cantTesorosEntre 1 (n2-1) (siguienteTramoDe c) 
+cantTesorosEntre n1 n2 c = cantTesorosEntre (n1-1) (n2-1) (siguienteTramoDe c)
+
+-- (Funcion auxiliar) Retorna la cantidad de tesoros en un tramo de camino dado.
+cantTesorosEnTramo :: Camino -> Int
+cantTesorosEnTramo (Fin)         = 0
+cantTesorosEnTramo (Nada _)      = 0
+cantTesorosEnTramo (Cofre obs _) = cantTesorosEn obs
+
+-- (Funcion auxiliar) Retorna el tramo de camino siguiente al camino dado.
+-- PRECOND: El tramo de camino dado no puede ser el fin de un camino.
+siguienteTramoDe :: Camino -> Camino 
+siguienteTramoDe (Fin)         = error "No hay otro tramo de camino despues del fin."
+siguienteTramoDe (Nada c)      = c
+siguienteTramoDe (Cofre obs c) = c
+
 -- Tipos arbóreos
 -- 2.1
 data Tree a = EmptyT | NodeT a (Tree a) (Tree a)
@@ -244,8 +252,11 @@ d) - (- x) = x
 simplificar :: ExpA -> ExpA
 simplificar (Sum e1 e2)  = simplificarSum e1 e2
 simplificar (Prod e1 e2) = simplificarProd e1 e2
-simplificar (Neg e1)     = simplificarNeg e1
+simplificar (Neg e1)     = simplificarNeg (Neg e1)
+simplificar e            = e
 
+-- (Funcion auxiliar) Dadas dos expresiones aritméticas a sumar, simplifica la suma según el siguiente criterios:
+-- a) 0 + x = x + 0 = x
 simplificarSum :: ExpA -> ExpA -> ExpA
 simplificarSum e1 e2 = if (eval e1 == 0)
                         then e2
@@ -253,6 +264,9 @@ simplificarSum e1 e2 = if (eval e1 == 0)
                          then e1
                          else (Sum e1 e2) 
 
+-- (Funcion auxiliar) Dadas dos expresiones aritméticas a multiplicar, simplifica el producto según los siguientes criterios:
+-- b) 0 * x = x * 0 = 0
+-- c) 1 * x = x * 1 = x
 simplificarProd :: ExpA -> ExpA -> ExpA 
 simplificarProd e1 e2 = if (eval e1 == 0 || eval e2 == 0)
                          then (Valor 0)
@@ -262,6 +276,8 @@ simplificarProd e1 e2 = if (eval e1 == 0 || eval e2 == 0)
                             then e1
                             else (Prod e1 e2) 
 
-
+-- (Funcion auxiliar) Dada una expresion aritmética a negar, simplifica la negación segun el siguiente criterio:
+-- d) - (- x) = x
 simplificarNeg :: ExpA -> ExpA
-simplificarNeg e = e
+simplificarNeg (Neg (Neg e)) = e  
+                    
