@@ -280,4 +280,7 @@ simplificarProd e1 e2 = if (eval e1 == 0 || eval e2 == 0)
 -- d) - (- x) = x
 simplificarNeg :: ExpA -> ExpA
 simplificarNeg (Neg (Neg e)) = e  
-                    
+
+
+
+
