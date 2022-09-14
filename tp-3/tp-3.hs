@@ -100,24 +100,21 @@ cantTesorosEn (ob:obs) = unoSi(esTesoro ob) + cantTesorosEn obs
 
 -- Dado un rango de pasos, indica la cantidad de tesoros que hay en ese rango. Por ejemplo, si el rango es 3 y 5, 
 -- indica la cantidad de tesoros que hay entre hacer 3 pasos y hacer 5. Están incluidos tanto 3 como 5 en el resultado.
--- PRECOND: El rango de pasos indicado debe estar dentro de los limites de la cantidad de pasos posibles en el camino dado.
-cantTesorosEntre :: Int -> Int -> Camino -> Int 
-cantTesorosEntre 1  1  c = cantTesorosEnTramo c 
-cantTesorosEntre 1  n2 c = cantTesorosEnTramo c + cantTesorosEntre 1 (n2-1) (siguienteTramoDe c) 
-cantTesorosEntre n1 n2 c = cantTesorosEntre (n1-1) (n2-1) (siguienteTramoDe c)
+-- PRECOND: i < j.
+cantTesorosEntre :: Int -> Int -> Camino -> Int
+cantTesorosEntre i j c = cantTesorosEntre' (i-1) (j-1) c 
 
--- (Funcion auxiliar) Retorna la cantidad de tesoros en un tramo de camino dado.
-cantTesorosEnTramo :: Camino -> Int
-cantTesorosEnTramo (Fin)         = 0
-cantTesorosEnTramo (Nada _)      = 0
-cantTesorosEnTramo (Cofre obs _) = cantTesorosEn obs
+cantTesorosEntre' :: Int -> Int -> Camino -> Int 
+cantTesorosEntre' i j (Fin)         = 0
+cantTesorosEntre' 0 j c             = cantTesorosHasta j c 
+cantTesorosEntre' i j (Nada c)      = cantTesorosEntre (i-1) (j-1) c 
+cantTesorosEntre' i j (Cofre obs c) = cantTesorosEntre (i-1) (j-1) c
 
--- (Funcion auxiliar) Retorna el tramo de camino siguiente al camino dado.
--- PRECOND: El tramo de camino dado no puede ser el fin de un camino.
-siguienteTramoDe :: Camino -> Camino 
-siguienteTramoDe (Fin)         = error "No hay otro tramo de camino despues del fin."
-siguienteTramoDe (Nada c)      = c
-siguienteTramoDe (Cofre obs c) = c
+cantTesorosHasta :: Int -> Camino -> Int
+cantTesorosHasta 0 c             = cantTesorosEnTramo c 
+cantTesorosHasta i (Fin)         = 0
+cantTesorosHasta i (Nada c)      = cantTesorosHasta (i-1) c 
+cantTesorosHasta i (Cofre obs c) = cantTesorosEn obs + cantTesorosHasta (i-1) c 
 
 -- Tipos arbóreos
 -- 2.1
