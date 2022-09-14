@@ -101,20 +101,22 @@ cantTesorosEn (ob:obs) = unoSi(esTesoro ob) + cantTesorosEn obs
 -- Dado un rango de pasos, indica la cantidad de tesoros que hay en ese rango. Por ejemplo, si el rango es 3 y 5, 
 -- indica la cantidad de tesoros que hay entre hacer 3 pasos y hacer 5. Están incluidos tanto 3 como 5 en el resultado.
 -- PRECOND: i < j.
-cantTesorosEntre :: Int -> Int -> Camino -> Int
-cantTesorosEntre i j c = cantTesorosEntre' (i-1) (j-1) c 
-
-cantTesorosEntre' :: Int -> Int -> Camino -> Int 
-cantTesorosEntre' i j (Fin)         = 0
-cantTesorosEntre' 0 j c             = cantTesorosHasta j c 
-cantTesorosEntre' i j (Nada c)      = cantTesorosEntre (i-1) (j-1) c 
-cantTesorosEntre' i j (Cofre obs c) = cantTesorosEntre (i-1) (j-1) c
+cantTesorosEntre :: Int -> Int -> Camino -> Int 
+cantTesorosEntre i j (Fin)         = 0
+cantTesorosEntre 0 j c             = cantTesorosHasta j c 
+cantTesorosEntre i j (Nada c)      = cantTesorosEntre (i-1) (j-1) c 
+cantTesorosEntre i j (Cofre obs c) = cantTesorosEntre (i-1) (j-1) c
 
 cantTesorosHasta :: Int -> Camino -> Int
 cantTesorosHasta 0 c             = cantTesorosEnTramo c 
 cantTesorosHasta i (Fin)         = 0
 cantTesorosHasta i (Nada c)      = cantTesorosHasta (i-1) c 
 cantTesorosHasta i (Cofre obs c) = cantTesorosEn obs + cantTesorosHasta (i-1) c 
+
+cantTesorosEnTramo :: Camino -> Int 
+cantTesorosEnTramo (Fin)         = 0
+cantTesorosEnTramo (Nada _)      = 0
+cantTesorosEnTramo (Cofre obs _) = cantTesorosEn obs 
 
 -- Tipos arbóreos
 -- 2.1
@@ -277,7 +279,11 @@ simplificarProd e1 e2 = if (eval e1 == 0 || eval e2 == 0)
 -- d) - (- x) = x
 simplificarNeg :: ExpA -> ExpA
 simplificarNeg (Neg (Neg e)) = e  
+<<<<<<< HEAD
 
 
 
 
+=======
+                    
+>>>>>>> 4b54340e02803cad7b8fbad4ff7f0b3825977e64
