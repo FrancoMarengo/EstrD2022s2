@@ -249,41 +249,43 @@ d) - (- x) = x
    Neg (Neg (Valor 2) = (Valor 2)
 -}
 simplificar :: ExpA -> ExpA
-simplificar (Sum e1 e2)  = simplificarSum e1 e2
-simplificar (Prod e1 e2) = simplificarProd e1 e2
-simplificar (Neg e1)     = simplificarNeg (Neg e1)
+simplificar (Sum e1 e2)  = simplificarSum (simplificar e1) (simplificar e2)
+simplificar (Prod e1 e2) = simplificarProd (simplificar e1) (simplificar e2)
+simplificar (Neg e1)     = simplificarNeg (simplificar e1)
 simplificar e            = e
 
 -- (Funcion auxiliar) Dadas dos expresiones aritméticas a sumar, simplifica la suma según el siguiente criterios:
 -- a) 0 + x = x + 0 = x
-simplificarSum :: ExpA -> ExpA -> ExpA
-simplificarSum e1 e2 = if (eval e1 == 0)
-                        then e2
-                        else if (eval e2 == 0)
-                         then e1
-                         else (Sum e1 e2) 
+simplificarSum :: ExpA -> ExpA -> ExpA 
+simplificarSum (Valor 0) e         = e  
+simplificarSum e         (Valor 0) = e
+simplificarSum e1        e2        = (Sum e1 e2)
 
 -- (Funcion auxiliar) Dadas dos expresiones aritméticas a multiplicar, simplifica el producto según los siguientes criterios:
 -- b) 0 * x = x * 0 = 0
 -- c) 1 * x = x * 1 = x
-simplificarProd :: ExpA -> ExpA -> ExpA 
-simplificarProd e1 e2 = if (eval e1 == 0 || eval e2 == 0)
-                         then (Valor 0)
-                          else if (eval e1 == 1)
-                           then e2
-                           else if (eval e2 == 1)
-                            then e1
-                            else (Prod e1 e2) 
+simplificarProd :: ExpA -> ExpA -> ExpA
+simplificarProd (Valor 0) _         = (Valor 0)
+simplificarProd _         (Valor 0) = (Valor 0)
+simplificarProd (Valor 1) e         = e
+simplificarProd e         (Valor 1) = e
+simplificarProd e1        e2        = (Prod e1 e2)
 
 -- (Funcion auxiliar) Dada una expresion aritmética a negar, simplifica la negación segun el siguiente criterio:
 -- d) - (- x) = x
 simplificarNeg :: ExpA -> ExpA
-simplificarNeg (Neg (Neg e)) = e  
-<<<<<<< HEAD
+simplificarNeg (Neg (Neg e)) = e 
+simplificarNeg e             = e
 
-
-
-
-=======
-                    
->>>>>>> 4b54340e02803cad7b8fbad4ff7f0b3825977e64
+expresion5 = (Sum 
+                 (Prod 
+                     (Valor 0)
+                     (Valor 295)
+                 )
+                 (Prod
+                     (Valor 1)
+                     (Neg 
+                        (Neg (Valor 5))
+                     )
+                 )
+             )
