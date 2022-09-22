@@ -274,8 +274,8 @@ simplificarProd e1        e2        = (Prod e1 e2)
 -- (Funcion auxiliar) Dada una expresion aritmética a negar, simplifica la negación segun el siguiente criterio:
 -- d) - (- x) = x
 simplificarNeg :: ExpA -> ExpA
-simplificarNeg (Neg (Neg e)) = e 
-simplificarNeg e             = e
+simplificarNeg (Neg e) = e
+simplificarNeg e       = (Neg e)
 
 expresion5 = (Sum 
                  (Prod 
