@@ -1,5 +1,5 @@
 module SetSRep (
-    SetSRep,
+    Set,
     emptyS,
     addS,
     belongs,
@@ -11,7 +11,7 @@ module SetSRep (
 
 where
 
-data SetSRep a = S [a] Int
+data Set a = S [a] Int
   {- INV.REP.: En (S xs n)
       * n indica la cantidad de elementos de la lista xs.
       * xs no puede tener elementos repetidos.
@@ -24,6 +24,7 @@ emptyS = (S [] 0)
 
 -- O(n) siendo n el costo operacional de elem. 
 -- Dados un elemento y un conjunto, agrega el elemento al conjunto.
+-- Precond: el elemento dado no se encuentra en el conjunto.
 addS :: Eq a => a -> Set a -> Set a
 addS x (S ys n) =
     if (elem x ys)
@@ -57,12 +58,16 @@ removeS' x (y:ys) =
      then ys
      else y : removeS' x ys
 
--- O(n) siendo n el costo operacional de la función '++' entre la lista xs e ys.
+-- O(n^2) ya que realiza la operacion addS(O(n)) por cada elemento de la lista dada.
 -- Dados dos conjuntos devuelve un conjunto con todos los elementos de ambos conjuntos.
 unionS :: Eq a => Set a -> Set a -> Set a
-unionS (S xs n) (S ys m) = unionS' xs ys 
+unionS (S xs n) s2 = unionS' xs s2
 
-unionS' :: Eq a => [a] -> [a] -> Set a
+-- O(n^2) ya que realiza la operacion addS(O(n)) por cada elemento de la lista dada.
+-- (Funcion auxiliar) dada una lista y un conjunto, añade los elementos de la lista al conjunto dado.
+unionS' :: Eq a => [a] -> Set a -> Set a
+unionS' [] s     = s
+unionS' (x:xs) s = addS x (unionS' xs s)
 
 -- O(1)
 -- Dado un conjunto devuelve una lista con todos los elementos distintos del conjunto.
