@@ -1,5 +1,5 @@
 module SetCRep (
-    SetCRep,
+    Set,
     emptyS,
     addS,
     belongs,
@@ -11,56 +11,60 @@ module SetCRep (
 
 where
 
-data SetSRep a = S [a]
+data Set a = S [a]
 -- No posee invariantes de representación.
 
 -- O(1)
 -- Crea un conjunto vacío.
 emptyS :: Set a
-emptyS = (S [] 0)
+emptyS = (S [])
 
--- O(n) siendo n el costo operacional de elem. 
+-- O(1) 
 -- Dados un elemento y un conjunto, agrega el elemento al conjunto.
 addS :: Eq a => a -> Set a -> Set a
-addS x (S ys n) =
-    if (elem x ys)
-     then (S ys n)
-     else (S (x:ys) (n+1))
+addS x (S ys) = (S (x:ys))
 
 -- O(n) siendo n el costo operacional de elem.
 -- Dados un elemento y un conjunto indica si el elemento pertenece al conjunto.
 belongs :: Eq a => a -> Set a -> Bool
-belongs x (S ys _) = elem x ys
+belongs x (S ys) = elem x ys
 
--- O(1)
+-- O(n) siendo n el costo operacional de length.
 -- Devuelve la cantidad de elementos distintos de un conjunto.
 sizeS :: Eq a => Set a -> Int
-sizeS (S _ n) = n
+sizeS (S xs) = length xs 
 
--- O(n*m) siendo n el costo operacional de removeS' y m el costo operacional de elem.
+-- O(n) siendo n el costo operacional de removeS'
 -- Borra un elemento del conjunto.
 -- Precond: El elemento dado debe estar en el conjunto.
 removeS :: Eq a => a -> Set a -> Set a
-removeS x (S ys n) = 
-    if (elem x ys)
-     then (S (removeS' x ys) (n-1))
-     else error "El elemento no estaba en el conjunto dado."
+removeS x (S ys) = (S (removeS' x ys))
 
 -- O(n) siendo n la cantidad de elementos de la lista dada.
 -- (Funcion auxiliar) dado un elemento y una lista de elementos, elimina el elemento dado de la lista.
+-- Precond: El elemento dado debe estar en el conjunto.
 removeS' :: Eq a => a -> [a] -> [a]
+removeS' x []     = error "El elemento no se encontraba en la lista dada"
 removeS' x (y:ys) = 
     if (x == y)
      then ys
      else y : removeS' x ys
 
--- O(n) siendo n el costo operacional de la función '++' entre la lista xs e ys.
+-- O(1)
 -- Dados dos conjuntos devuelve un conjunto con todos los elementos de ambos conjuntos.
 unionS :: Eq a => Set a -> Set a -> Set a
-unionS (S xs n) (S ys m) = (S (xs++ys) (n+m))
+unionS (S xs) (S ys) = (S (xs++ys))
 
--- O(1)
+-- O(n) siendo n el costo operacional de sinRepetidosL
 -- Dado un conjunto devuelve una lista con todos los elementos distintos del conjunto.
 setToList :: Eq a => Set a -> [a]
-setToList (S xs _) = xs
-)
+setToList (S xs) = sinRepetidosL xs
+
+-- O(n^2) siendo n la cantidad de elementos de la lista.
+-- (Funcion auxiliar) dada una lista retorna una lista sin repetidos.
+sinRepetidosL :: Eq a => [a] -> [a]
+sinRepetidosL []     = []
+sinRepetidosL (x:xs) =
+    if (elem x xs)
+     then sinRepetidosL xs
+     else x : (sinRepetidosL xs)
