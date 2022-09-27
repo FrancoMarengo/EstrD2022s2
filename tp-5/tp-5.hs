@@ -1,4 +1,8 @@
 import SetSRep
+-- import SetCRep
+import Queue
+-- import QueueInv
+
 -- Calculo de costos
 
 -- O(1)
@@ -116,3 +120,30 @@ unirTodos (NodeT s t1 t2) = unionS s (unionS (unirTodos t1) (unirTodos t2))
 
 -- Tipo tree a definido para evitar error.
 data Tree a = EmptyT | NodeT a (Tree a) (Tree a)
+
+-- Queue
+
+-- O(n) siendo n la cantidad de elementos de la cola.
+-- Cuenta la cantidad de elementos de la cola.
+lengthQ :: Queue a -> Int
+lengthQ q =
+    if (isEmptyQ q)
+     then 0
+     else 1 + (lengthQ (dequeue q))
+
+-- O(n*m) siendo n la cantidad de elementos de la cola y m el costo operacional de la funcion isEmptyQ
+-- Dada una cola devuelve la lista con los mismos elementos, donde el orden de la lista es el de la cola.
+-- Nota: chequear que los elementos queden en el orden correcto.
+queueToList :: Queue a -> [a]
+queueToList q =
+    if (isEmptyQ q)
+     then []
+     else firstQ q : queueToList (dequeue q)
+
+-- O(n*m) siendo n la cantidad de elementos de q1 y m el costo operacional de la funcion isEmptyQ
+-- Inserta todos los elementos de la segunda cola en la primera
+unionQ :: Queue a -> Queue a -> Queue a
+unionQ q1 q2 = 
+    if (isEmptyQ q1)
+     then q2
+     else enqueue (firstQ q1) (unionQ (dequeue q1) q2) 
