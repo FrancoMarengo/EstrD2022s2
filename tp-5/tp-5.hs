@@ -147,3 +147,29 @@ unionQ q1 q2 =
     if (isEmptyQ q1)
      then q2
      else enqueue (firstQ q1) (unionQ (dequeue q1) q2) 
+
+-- Stack
+
+-- O(n*m) siendo n la cantidad de elementos de la lista dada, y m el costo
+--        operacional de la funcion push. 
+-- Dada una lista devuelve una pila sin alterar el orden de los elementos.
+apilar :: [a] -> Stack a
+apilar []     = emptyS
+apilar (x:xs) = push x (apilar xs)
+
+-- O(n*m) siendo n la cantidad de elementos de la lista dada, y m el costo
+--        operacional de la funcion isEmptyS. 
+-- Dada una pila devuelve una lista sin alterar el orden de los elementos.
+desapilar :: Stack a -> [a]
+desapilar s =
+    if (isEmptyS s)
+     then []
+     else top s : desapilar (pop s)
+
+-- O(n*m) siendo n la cantidad de elementos de la lista dada, y m el costo
+--        operacional de la funcion push.
+-- Dada una posicion válida en la stack y un elemento, ubica dicho elemento en dicha
+-- posición (se desapilan elementos hasta dicha posición y se inserta en ese lugar).
+insertarEnPos :: Int -> a -> Stack a -> Stack a
+insertarEnPos 0 x s = push x s 
+insertarEnPos n x s = push (top s) (insertarEnPos (n-1) x (pop s))
