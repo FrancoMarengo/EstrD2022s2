@@ -60,7 +60,7 @@ dropN 0 xs     = xs
 dropN n []     = []
 dropN n (x:xs) = dropN (n-1) xs
 
--- O(n*2) siendo n el número dado.
+-- O(n) siendo n el número dado.
 partir :: Int -> [a] -> ([a], [a])
 partir n xs = (takeN n xs, dropN n xs)
 
@@ -77,7 +77,7 @@ sacar n (x:xs) =
      then xs
      else x : sacar n xs
 
--- O((n^2)*2) siendo n la cantidad de elementos de la lista dada.
+-- O(n^2) siendo n la cantidad de elementos de la lista dada.
 ordenar :: Ord a => [a] -> [a]
 ordenar [] = []
 orderar xs =
@@ -116,4 +116,3 @@ unirTodos (NodeT s t1 t2) = unionS s (unionS (unirTodos t1) (unirTodos t2))
 
 -- Tipo tree a definido para evitar error.
 data Tree a = EmptyT | NodeT a (Tree a) (Tree a)
-       
