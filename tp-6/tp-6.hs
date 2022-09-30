@@ -1,5 +1,7 @@
 import PriorityQueue
-import MapSRep
+-- import MapCRep
+-- import MapSRep
+import MapDos
 import Maybe
 
 -- Priority queue
