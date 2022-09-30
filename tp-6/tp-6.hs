@@ -1,4 +1,6 @@
 import PriorityQueue
+import MapSRep
+import Maybe
 
 -- Priority queue
 
@@ -40,7 +42,7 @@ valuesParaKeys (k:ks) m = lookupM k m : valuesParaKeys ks m
 -- Propósito: indica si en el map se encuentran todas las claves dadas.
 todasAsociadas :: Eq k => [k] -> Map k v -> Bool
 todasAsociadas [] _     = True 
-todasAsociadas (k:ks) m = not (isNothing (lookupM k m)) && todasAsociadas ks m 
+todasAsociadas (k:ks) m = isJust (lookupM k m) && todasAsociadas ks m 
 
 -- O(n*M) siendo n la cantidad de elementos de la lista dada y M el costo operacional
 --        de assocM, ya que depende de su implementacion.
@@ -62,11 +64,11 @@ tuplasParaKeys :: Eq k => [k] -> Map k v -> [(k, v)]
 tuplasParaKeys []     _ = []
 tuplasParaKeys (k:ks) m = (k, fromJust (lookupM k m)) : tuplasParaKeys ks m
 
--- O(n^2) ya que por cada par de la lista dada, realiza agregarClaveValor, que en el peor caso es lineal.
+-- O(n^2) ya que por cada par de la lista dada, realiza agregarClaveValores, que en el peor caso es lineal.
 -- Propósito: dada una lista de pares clave valor, agrupa los valores de los pares que compartan la misma clave.
 agruparEq :: Eq k => [(k, v)] -> Map k [v]
 agruparEq []       = emptyM
-agruparEq (kv:kvs) = agregarClaveValor kv (agruparEq kvs)
+agruparEq (kv:kvs) = agregarClaveValores kv (agruparEq kvs)
 
 -- O(n*M) siendo n la cantidad de elementos en el map y M el costo operacional de assocM/lookupM
 --        que en el peor caso alguna de las dos es lineal.
@@ -74,11 +76,11 @@ agruparEq (kv:kvs) = agregarClaveValor kv (agruparEq kvs)
 --                               map asocia la clave, con los valores previos pero agregandole la clave dada.
 --                               Si la clave no se encuentra en el map, asocia la clave con una lista singular
 --                               que contiene el valor dado.
-agregarClaveValor :: Eq => (k, v) -> Map k [v] -> Map k [v]
-agregarClaveValor (k,v) m = 
+agregarClaveValores :: Eq k =>  (k, v) -> Map k [v] -> Map k [v]
+agregarClaveValores (k, v) m = 
     if isNothing (lookupM k m)
      then assocM k [v] m
-     else assocM k (v : (fromJust (lookupM k m)) m
+     else assocM k (v : (fromJust (lookupM k m))) m
 
 -- O(n^2) ya que por cada clave dada, realiza lookupM/assocM que en el peor caso alguna es lineal.
 -- Propósito: dada una lista de claves de tipo k y un map que va de k a Int, le suma uno a
