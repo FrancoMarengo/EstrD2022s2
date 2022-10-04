@@ -1,8 +1,9 @@
 import PriorityQueue
--- import MapCRep
+import MapCRep
 -- import MapSRep
-import MapDos
+-- import MapDos
 import Maybe
+import MultiSet
 
 -- Priority queue
 
@@ -110,3 +111,51 @@ mergeMaps m1 m2 = agregarParesKV (mapToList m1) m2
 agregarParesKV :: Eq k => [(k, v)] -> Map k v -> Map k v
 agregarParesKV [] m          = m 
 agregarParesKV ((k,v):kvs) m = assocM k v (agregarParesKV kvs m) 
+
+-- O(n^2)
+-- Propósito: dada una lista de elementos construye un map que relaciona cada elemento con
+-- su posición en la lista.
+indexar :: [a] -> Map Int a
+indexar []     = emptyM
+indexar (x:xs) = assocM 0 x (aumentarClaves (indexar xs))
+
+-- O(n^2) ya que usa mapToList
+-- (Funcion auxiliar) Propósito: dado un Map Int a, aumenta en 1 todas las claves.
+aumentarClaves :: Map Int a -> Map Int a
+aumentarClaves m = listToMap (aumentar (mapToList m))
+
+-- O(n)
+-- (Funcion auxiliar) Propósito: dada una lista de pares número-valor, aumenta en 1 el número de cada par.
+aumentar :: [(Int, v)] -> [(Int, v)]
+aumentar []          = []
+aumentar ((n,v):nvs) = ((n+1), v) : aumentar nvs
+
+-- O(n^2)
+-- Propósito: dado un string, devuelve un map donde las claves son los caracteres que aparecen
+-- en el string, y los valores la cantidad de veces que aparecen en el mismo.
+ocurrencias :: String -> Map Char Int
+ocurrencias s = listToMap (apariciones s)
+
+-- O(n^2)
+-- (Funcion auxiliar) Propósito: dado un string devuelve una lista de pares Char-Int que indican la cantidad
+--                               de apariciones de un caracter en el string.
+apariciones :: String -> [(Char, Int)]
+apariciones []     = []
+apariciones (c:cs) = (c, 1 + (cantApariciones c cs)) : apariciones cs
+
+-- O(n)
+-- (Funcion auxiliar) Propósito: dado un Char indica la cantidad de veces que aparece en un string dado.
+cantApariciones :: Char -> String -> Int
+cantApariciones c []     = 0
+cantApariciones c (x:xs) = if c == x
+						    then 1 + cantApariciones c xs
+						    else cantApariciones c xs
+
+-- MultiSet
+
+-- O(n*M) siendo n la cantidad de caracteres en el string y M el costo operacional de addMS.
+-- Propósito: dado un string, devuelve un map donde las claves son los caracteres que aparecen
+-- en el string, y los valores la cantidad de veces que aparecen en el mismo.
+ocurrenciasMS :: String -> MultiSet Char
+ocurrenciasMS []     = emptyMS
+ocurrenciasMS (c:cs) = addMS c (ocurrenciasMS cs) 
