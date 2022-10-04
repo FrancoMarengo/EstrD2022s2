@@ -76,10 +76,23 @@ tuplasParaKeys :: Eq k => [k] -> Map k v -> [(k, v)]
 tuplasParaKeys []     _ = []
 tuplasParaKeys (k:ks) m = (k, fromJust (lookupM k m)) : tuplasParaKeys ks m
 
+-- O(n^2) en el peor caso usa mapToList que es cuadrática.
 -- Propósito: dados dos multiconjuntos devuelve el multiconjunto de elementos que ambos
 -- multiconjuntos tienen en común.
 intersectionMS :: Ord a => MultiSet a -> MultiSet a -> MultiSet a 
-intersectionMS (MS m1) (MS m2) = undefined
+intersectionMS (MS m1) (MS m2) = MS (interseccion (mapToList m1) m2)
+
+-- O(n*M) siendo n la cantidad de elementos en el Map y M el costo operacional mas caro de lookupM o assocM
+-- (Funcion auxiliar) Propósito: dado una lista de pares elemento-valor y un Map elemento valor, retorna un Map
+--                               resultante de interseccionar los elementos de los pares con los elementos del
+--                               map, sumando los valores en el caso que interseccionen elementos.
+interseccion :: Ord a => [(a, Int)] -> Map a Int -> Map a Int 
+interseccion []          m = emptyM
+interseccion ((x,n):xns) m = 
+    let lkpx = lookupM x m in
+        if isNothing lkpx
+         then interseccion xns m
+         else assocM x (n + fromJust lkpx) (interseccion xns m)
 
 -- Propósito: dado un multiconjunto devuelve una lista con todos los elementos del conjunto y
 -- su cantidad de ocurrencias.
