@@ -155,3 +155,154 @@ balanceado (NodeT x ti td) = abs (heightT ti - heightT td) <= 1
 heightT :: Tree a -> Int
 heightT EmptyT          = 0 
 heightT (NodeT _ t1 t2) = 1 + max (heightT t1) (heightT t2)
+
+-- Ejercicio 3
+{-
+Dada la siguiente interfaz y costos para el tipo abstracto Map:
+
+emptyM :: Map k v
+Costo: O(1).
+
+assocM :: Ord k => k -> v -> Map k v -> Map k v
+Costo: O(log K).
+
+lookupM :: Ord k => k -> Map k v -> Maybe v
+Costo: O(log K).
+
+deleteM :: Ord k => k -> Map k v -> Map k v
+Costo: O(log K).
+
+keys :: Map k v -> [k]
+Costo: O(K).
+
+recalcular el costo de las funciones como usuario de Map de la práctica anterior, siendo K es la
+cantidad de claves del Map. Justificar las respuestas.
+-}
+
+-- O(K log K) porque primero obtiene todas las claves con keys O(K) y despues utiliza
+--            valuesParaKeys (en este caso k == K, o sea todos los elementos del map)
+-- Propósito: obtiene los valores asociados a cada clave del map.
+valuesM :: Eq k => Map k v -> [Maybe v]
+valuesM m = valuesParaKeys (keys m) m
+
+-- O(k * log K) siendo k la cantidad de elementos de la lista dada y 
+--              porque utiliza lookupM O(log K) por cada elemento de la lista.
+-- (Funcion auxiliar) Propósito: dada una lista de keys y un map, retorna
+--                               la lista de claves asociadas a las keys dadas.
+valuesParaKeys :: Eq k => [k] -> Map k v -> [Maybe v]
+valuesParaKeys []     m = []
+valuesParaKeys (k:ks) m = lookupM k m : valuesParaKeys ks m
+
+-- O(k * log K) siendo k la cantidad de elementos de la lista dada y porque 
+--              utiliza lookupM O(log K) por cada uno de estos elementos.
+-- Propósito: indica si en el map se encuentran todas las claves dadas.
+todasAsociadas :: Eq k => [k] -> Map k v -> Bool
+todasAsociadas [] _     = True 
+todasAsociadas (k:ks) m = isJust (lookupM k m) && todasAsociadas ks m 
+
+-- O(k * log K) siendo k la cantidad de elementos de la lista dada y porque 
+--              utiliza assocM O(log K) por cada uno de estos elementos.
+-- Propósito: convierte una lista de pares clave valor en un map.
+listToMap :: Eq k => [(k, v)] -> Map k v
+listToMap []          = emptyM
+listToMap ((k,v):kvs) = assocM k v (listToMap kvs)
+
+-- O(K log K) porque primero obtiene todas las claves con keys O(K) y despues utiliza
+--            tuplasParaKeys (en este caso k == K, o sea todos los elementos del map) 
+-- Propósito: convierte un map en una lista de pares clave valor.
+mapToList :: Eq k => Map k v -> [(k, v)]
+mapToList m = tuplasParaKeys (keys m) m
+
+-- O(k * log K) siendo k la cantidad de elementos de la lista dada y porque 
+--              utiliza lookupM O(log K) por cada uno de estos elementos.
+-- (Funcion auxiliar) Propósito: dada una lista de claves y un map, retorna una lista de pares 
+--                               compuestos por cada llave dada con su valor asociado.
+-- Precond: todas las keys dadas deben tener un valor asociado en el map dado.
+tuplasParaKeys :: Eq k => [k] -> Map k v -> [(k, v)]
+tuplasParaKeys []     _ = []
+tuplasParaKeys (k:ks) m = (k, fromJust (lookupM k m)) : tuplasParaKeys ks m
+
+-- O(k * log K) siendo k la cantidad de elementos de la lista dada y porque 
+--              utiliza lookupM/assocM O(log K) por cada uno de estos elementos.
+-- Propósito: dada una lista de pares clave valor, agrupa los valores de los pares que compartan la misma clave.
+agruparEq :: Eq k => [(k, v)] -> Map k [v]
+agruparEq []       = emptyM
+agruparEq (kv:kvs) = agregarClaveValores kv (agruparEq kvs)
+
+-- O(log K) porque utiliza lookupM/assocM que son O(log K) 
+-- (Funcion auxiliar) Propósito: dado un par clave-valor y un map clave-valores, si la clave se encuentra en el 
+--                               map asocia la clave, con los valores previos pero agregandole la clave dada.
+--                               Si la clave no se encuentra en el map, asocia la clave con una lista singular
+--                               que contiene el valor dado.
+agregarClaveValores :: Eq k =>  (k, v) -> Map k [v] -> Map k [v]
+agregarClaveValores (k, v) m = 
+    if isNothing (lookupM k m)
+     then assocM k [v] m
+     else assocM k (v : (fromJust (lookupM k m))) m
+
+-- O(k * log K) siendo k la cantidad de elementos de la lista dada y porque 
+--              utiliza lookupM/assocM O(log K) por cada uno de estos elementos. 
+-- Propósito: dada una lista de claves de tipo k y un map que va de k a Int, le suma uno a
+-- cada número asociado con dichas claves.
+incrementar :: Eq k => [k] -> Map k Int -> Map k Int
+incrementar [] m     = m
+incrementar (k:ks) m = 
+    if isNothing (lookupM k m)
+     then incrementar ks m
+     else assocM k (1 + fromJust (lookupM k m)) (incrementar ks m)
+
+-- O(K log K) ya que utiliza mapToList O(K log K) y despues agregarParesKV O(k log K),
+--            en este caso k == K 
+-- Propósito: dado dos maps se agregan las claves y valores del primer map en el segundo. Si
+-- una clave del primero existe en el segundo, es reemplazada por la del primero.
+mergeMaps:: Eq k => Map k v -> Map k v -> Map k v
+mergeMaps m1 m2 = agregarParesKV (mapToList m1) m2
+
+-- O(k * log K) siendo k la cantidad de elementos de la lista dada y porque 
+--              utiliza lookupM/assocM O(log K) por cada uno de estos elementos. 
+-- (Funcion auxiliar) Propósito: dada una lista de pares clave-valor y un map clave-valor,
+--                               retorna el map con las claves dadas, asociadas a los valores dados.
+--                               Si una clave ya existia en el map, se sobreescribe con el valor 
+--                               dado.
+agregarParesKV :: Eq k => [(k, v)] -> Map k v -> Map k v
+agregarParesKV [] m          = m 
+agregarParesKV ((k,v):kvs) m = assocM k v (agregarParesKV kvs m) 
+
+-- O(k^2) ya que en el peor caso utiliza aumentar claves por cada elemento de la lista
+-- Propósito: dada una lista de elementos construye un map que relaciona cada elemento con
+-- su posición en la lista.
+indexar :: [a] -> Map Int a
+indexar []     = emptyM
+indexar (x:xs) = assocM 0 x (aumentarClaves (indexar xs))
+
+-- O(K^2) ya que en el peor caso utiliza aumentar por cada elemento del map  
+-- (Funcion auxiliar) Propósito: dado un Map Int a, aumenta en 1 todas las claves.
+aumentarClaves :: Map Int a -> Map Int a
+aumentarClaves m = listToMap (aumentar (mapToList m))
+
+-- O(k) siendo k la cantidad de elementos en la lista dada
+-- (Funcion auxiliar) Propósito: dada una lista de pares número-valor, aumenta en 1 el número de cada par.
+aumentar :: [(Int, v)] -> [(Int, v)]
+aumentar []          = []
+aumentar ((n,v):nvs) = ((n+1), v) : aumentar nvs
+
+-- O(s^2) ya que en el peor caso utiliza apariciones O(s^2) en el string dado
+-- Propósito: dado un string, devuelve un map donde las claves son los caracteres que aparecen
+-- en el string, y los valores la cantidad de veces que aparecen en el mismo.
+ocurrencias :: String -> Map Char Int
+ocurrencias s = listToMap (apariciones s)
+
+-- O(s^2) ya que utiliza cantApariciones por cada char del string
+-- (Funcion auxiliar) Propósito: dado un string devuelve una lista de pares Char-Int que indican la cantidad
+--                               de apariciones de un caracter en el string.
+apariciones :: String -> [(Char, Int)]
+apariciones []     = []
+apariciones (c:cs) = (c, 1 + (cantApariciones c cs)) : apariciones cs
+
+-- O(s) siendo k la cantidad de char en el string dado
+-- (Funcion auxiliar) Propósito: dado un Char indica la cantidad de veces que aparece en un string dado.
+cantApariciones :: Char -> String -> Int
+cantApariciones c []     = 0
+cantApariciones c (x:xs) = if c == x
+						    then 1 + cantApariciones c xs
+						    else cantApariciones c xs
