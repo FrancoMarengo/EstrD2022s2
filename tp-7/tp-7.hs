@@ -306,3 +306,36 @@ cantApariciones c []     = 0
 cantApariciones c (x:xs) = if c == x
 						    then 1 + cantApariciones c xs
 						    else cantApariciones c xs
+
+-- Ejercicio 4
+{-
+Dado la siguiente representación para el tipo abstrcto Empresa:
+type SectorId = Int
+type CUIL = Int
+
+data Empresa = ConsE (Map SectorId (Set Empleado)) 
+                     (Map CUIL Empleado)
+
+Y la siguiente interfaz para Empleado:
+
+consEmpleado :: CUIL -> Empleado
+Propósito: construye un empleado con dicho CUIL.
+Costo: O(1)
+
+cuil :: Empleado -> CUIL
+Propósito: indica el CUIL de un empleado.
+Costo: O(1)
+
+incorporarSector :: SectorId -> Empleado -> Empleado
+Propósito: incorpora un sector al conjunto de sectores en los que trabaja un empleado.
+Costo: O(log S), siendo S la cantidad de sectores que el empleado tiene asignados.
+
+sectores :: Empleado -> SectorId
+Propósito: indica los sectores en los que el empleado trabaja.
+Costo: O(1)
+
+Indicar invariantes de representación adecuados para la estructura y definir la 
+interfaz de Empresa, respetando los costos dados y calculando los faltantes. Justificar
+todos los costos dados. En los costos, S es la cantidad de sectores de la empresa, y E es la
+cantidad de empleados.
+-}
