@@ -339,3 +339,93 @@ interfaz de Empresa, respetando los costos dados y calculando los faltantes. Jus
 todos los costos dados. En los costos, S es la cantidad de sectores de la empresa, y E es la
 cantidad de empleados.
 -}
+
+-- Ejercicio 5
+
+-- Como usuario del tipo Empresa implementar las siguientes operaciones, calculando el costo obtenido al implementarlas,
+--  y justificando cada uno adecuadamente
+
+-- import Empresa 
+
+-- Propósito: construye una empresa con la información de empleados dada. Los sectores no
+-- tienen empleados.
+-- Costo: O(s * c * log S * log E) siendo s la cantidad de sectores dados, c la cantidad de cuils dados.
+comenzarCon :: [SectorId] -> [CUIL] -> Empresa
+comenzarCon ss cs = agregarSectores ss (agregarCuils cs consEmpresa)
+
+-- (Funcion auxiliar) Propósito: agrega los sectores dados, sin ningun empleado, a la empresa dada
+-- Costo: O(s * log S) siendo s la cantidad de sectores dados y S la cantidad de sectores en la empresa
+agregarSectores :: [SectorId] -> Empresa -> Empresa
+agregarSectores []     e = e 
+agregarSectores (s:ss) e = agregarSector s (agregarSectores ss e)
+
+-- (Funcion auxiliar) Propósito: agrega los cuils dados a la empresa dada
+-- Costo: O(c * log E) siendo c la cantidad de cuils dados y E la cantidad de empleados de la empresa
+agregarCuils :: [CUIL] -> Empresa -> Empresa
+agregarCuils []     e = e
+agregarCuils (c:cs) e = agregarEmpleado [] c (agregarCuils cs e)
+
+-- Propósito: dada una empresa elimina a la mitad de sus empleados (sin importar a quiénes).
+-- Costo: O(E * (log C * s * (log E * log S)) siendo C la cantidad de cuils en mc, s la cantidad de sectores
+--                                            asignados en el empleado, E la cantidad de empleados en la empresa,
+--                                            S la cantidad de sectores en la empresa.
+recorteDePersonal :: Empresa -> Empresa
+recorteDePersonal e = borrarEmpleados (mitadDeEmpleados e) e 
+
+-- (Funcion auxiliar) Propósito: dada una lista de cuils de empleados, elimina los empleados de la empresa dada.
+-- Costo: O(c * (log C * s * (log E * log S)) siendo C la cantidad de cuils en mc, s la cantidad de sectores
+--                                            asignados en el empleado, E la cantidad de empleados en la empresa,
+--                                            S la cantidad de sectores en la empresa y c la cantidad de cuils dados
+borrarEmpleados :: [CUIL] -> Empresa -> Empresa
+borrarEmpleados []     e = e 
+borrarEmpleados (c:cs) e = borrarEmpleado c (borrarEmpleados cs e)
+
+-- (Funcion auxiliar) Propósito: retorna los cuils de la primer mitad de los empleados de la empresa.
+-- Costo: O(E) siendo E los empleados de la empresa dada
+mitadDeEmpleados :: Empresa -> [CUIL]
+mitadDeEmpleados e = 
+    let cuils = todosLosCUIL e
+    in takeN (div (length cuils) 2) cuils
+
+-- (Funcion auxiliar - práctica 5) 
+-- O(n) siendo n el número dado.
+takeN :: Int -> [a] -> [a]
+takeN 0 xs     = []
+takeN n []     = []
+takeN n (x:xs) = x : takeN (n-1) xs
+
+-- Propósito: dado un CUIL de empleado le asigna todos los sectores de la empresa.
+-- Costo: O(S * M * log S * log E) siendo M el costo operacional de incorporarSector (logaritmico)
+--                                 S la cantidad de sectores de la empresa y E la cantidad de empleados
+--                                 de la empresa
+convertirEnComodin :: CUIL -> Empresa -> Empresa
+convertirEnComodin c e = 
+    let sec = todosLosSectores e 
+    in asignarASectores sec c (asignarSectoresAEmpleado sec c e) e
+
+-- (Funcion auxiliar) Propósito: asigna los sectores dados a un empleado de la empresa dada, segun su cuil
+--                    Precond: el cuil dado debe estar registrado en la empresa
+-- Costo: O(s * M * log S * log E) siendo M el costo operacional de incorporarSector (logaritmico)
+--                                 S la cantidad de sectores de la empresa, E la cantidad de empleados
+--                                 de la empresa y s la cantidad de sectores dados
+asignarSectoresAEmpleado :: [SectorId] -> CUIL -> Empresa -> Empresa
+asignarSectoresAEmpleado []     _ e = e 
+asignarSectoresAEmpleado (s:ss) c e = agregarASector s c (asignarSectoresAEmpleado ss c e)
+
+-- Propósito: dado un CUIL de empleado indica si el empleado está en todos los sectores.
+-- Costo: O(s^2) siendo s la cantidad de sectores de la empresa.
+esComodin :: CUIL -> Empresa -> Bool
+esComodin c e = estaEnLosSectores (buscarPorCUIL c e) (todosLosSectores e) 
+
+-- (Funcion auxiliar) Propósito: dado un empleado y una lista de sectores, indica si el empleado se encuentra
+--                               en todos los sectores dados
+-- Cosot: O(s^2) siendo s la cantidad de sectores de la empresa
+estaEnLosSectores :: Empleado -> [SectorId] -> Bool 
+estaEnLosSectores e ss = todosPertenecen (sectores e) ss
+
+-- (Funcion auxiliar) Propósito: dadas dos listas de sectores, indica si todos los sectores de la
+--                               segunda lista se encuentran en la primera
+-- Costo: O(s^2) siendo s la cantidad de sectores dados en la primer lista
+todosPertenecen :: [SectorId] -> [SectorId] -> Bool
+todosPertenecen ss' []     = True
+todosPertenecen ss' (s:ss) = elem s ss' && todosPertenecen ss ss' 
