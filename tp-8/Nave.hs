@@ -61,6 +61,28 @@ ingresarT n r (N ms mt mh) =
 -- d)
 -- Propósito: Devuelve los sectores asignados a un tripulante.
 -- Precondición: Existe un tripulante con dicho nombre.
--- Eficiencia: O(log M)
+-- Eficiencia: O(log M) porque en peor caso se realiza lookupM recorriendo todo el map hasta encontrar al tripulante
+--             y esto tiene costo O(log M), posteriormente se realiza sectoresT O(1) que se simplifica en el costo final.
 sectoresAsignados :: Nombre -> Nave -> Set SectorId
-                       
+sectoresAsignados n (N _ mt _) = 
+    case lookupM n mt of
+        Just t  -> sectoresT t 
+        Nothing -> error "No existe el tripulante en la nave"
+
+-- e)
+-- Propósito: Dado un sector, devuelve los tripulantes y los componentes asignados a ese sector.
+-- Precondición: Existe un sector con dicho id.
+-- Eficiencia: O(log S) porque en peor caso se realiza lookupM recorriendo todo el map hasta encontrar al sector
+--             y esto tiene costo O(log S), posteriormente se realiza sectoresT O(1) y componentesS O(1) que se
+--             simplifican en el costo final.
+datosDeSector :: SectorId -> Nave -> (Set Nombre, [Componente])
+datosDeSector id (N ms _ _) =
+    case lookupM id ms of
+        just s  -> (tripulantesS, componentesS)
+        nothing -> error "No existe un sector con el id dado"
+    
+-- f)
+-- Propósito: Devuelve la lista de tripulantes ordenada por rango, de mayor a menor.
+-- Eficiencia: O(log T)
+tripulantesN :: Nave -> [Tripulante]
+tripulantesN (N _ _ mh) = 
