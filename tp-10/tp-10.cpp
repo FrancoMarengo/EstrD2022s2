@@ -2,6 +2,7 @@
 #include "Persona.h"
 #include "Pokemon.h"
 #include "Entrenador.h"
+#include "ArrayList.h"
 using namespace std;
 
 // Registros
@@ -17,5 +18,6 @@ using namespace std;
 // nombre, una cantidad de pokémon y un array de pokémon.
 
 int main() {
-    
+    ArrayList rs = newArrayListWith(-2);
+    add(2, rs);
 }
