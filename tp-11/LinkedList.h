@@ -48,3 +48,7 @@ void DisposeIterator(ListIterator ixs);
 
 // Libera la memoria ocupada por la lista.
 void DestroyL(LinkedList xs);
+
+// Agrega todos los elementos de la segunda lista al final de los de la primera.
+// La segunda lista se destruye.
+void Append(LinkedList xs, LinkedList ys);

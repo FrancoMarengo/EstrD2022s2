@@ -119,3 +119,20 @@ void DestroyL(LinkedList xs) {
     }
     delete xs;
 }
+
+// Agrega todos los elementos de la segunda lista al final de los de la primera.
+// La segunda lista se destruye.
+// Para implementar esta operacion como O(1) necesito conocer el último elemento de xs.
+void Append(LinkedList xs, LinkedList ys) {
+    if (xs->cantidad > 0) {
+        NodoL* siguienteNodo = xs->primero;
+        while(siguienteNodo->siguiente != NULL) {
+            siguienteNodo = siguienteNodo->siguiente;
+        }
+        siguienteNodo->siguiente = ys->primero;
+    } else {
+        xs->primero = ys->primero;
+    }
+    xs->cantidad += ys->cantidad;
+    delete ys;
+}
