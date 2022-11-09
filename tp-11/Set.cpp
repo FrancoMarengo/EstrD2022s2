@@ -18,6 +18,7 @@ struct SetSt {
 */
 
 // Crea un conjunto vacío.
+// Costo: O(1)
 Set emptyS() {
     SetSt* s = new SetSt;
     s->cantidad = 0;
@@ -26,15 +27,17 @@ Set emptyS() {
 }
 
 // Indica si el conjunto está vacío.
+// Costo: O(1)
 bool isEmptyS(Set s) {
     return s->cantidad == 0;
 }
 
 // Indica si el elemento pertenece al conjunto.
+// Costo: O(n) en peor caso, siendo n la cantidad de elementos en el set.
 bool belongsS(int x, Set s) {
     NodoS* nodoAMirar = s->primero;
     bool belongs = false;
-    while (nodoAMirar != NULL) {
+    while (nodoAMirar != NULL && !belongs) {
         belongs |= nodoAMirar->elem == x;
         nodoAMirar = nodoAMirar->siguiente;
     }
@@ -42,6 +45,7 @@ bool belongsS(int x, Set s) {
 }
 
 // Agrega un elemento al conjunto.
+// Costo: O(n) en peor caso recorre todos los elementos en el set con belongsS.
 void AddS(int x, Set s) {
     if (!belongsS(x, s)) {
         NodoS* nuevoN = new NodoS;
@@ -53,6 +57,7 @@ void AddS(int x, Set s) {
 }
 
 // Quita un elemento dado.
+// Costo: O(n) en peor caso, recorre todos los elementos en el set 2 veces.
 void RemoveS(int x, Set s) {
     if (belongsS(x, s)) {
         if (s->primero->elem == x) {
@@ -74,11 +79,13 @@ void RemoveS(int x, Set s) {
 }
 
 // Devuelve la cantidad de elementos.
+// Costo: O(1)
 int sizeS(Set s) {
     return s->cantidad;
 }
 
 // Devuelve una lista con los lementos del conjunto.
+// Costo: O(n) siempre recorre todos los elementos del set.
 LinkedList setToList(Set s) {
     NodoS* nodoAMirar = s->primero;
     LinkedList xs = nil();
@@ -90,6 +97,7 @@ LinkedList setToList(Set s) {
 }
 
 // Libera la memoria ocupada por el conjunto.
+// Costo: O(n) siempre recorre todos los elementos del set para borrarlos.
 void DestroyS(Set s) {
     if (s->cantidad > 0) {
         NodoS* temp = s->primero->siguiente;
