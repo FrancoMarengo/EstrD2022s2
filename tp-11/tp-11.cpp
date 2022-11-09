@@ -79,7 +79,7 @@ int minimo(LinkedList xs) {
 // elemento en la estructura de LinkedList)
 LinkedList copy(LinkedList xs) {
     ListIterator ixs = getIterator(xs);
-    LinkedList   ys  =  nil();
+    LinkedList   ys  = nil();
     while (!atEnd(ixs)) {
         Snoc(current(ixs), ys);
         Next(ixs);
@@ -103,10 +103,6 @@ void Append(LinkedList xs, LinkedList ys) {
 }
 
 int main() {
-    LinkedList xs = nil();
-    Snoc(7, xs);
-    Snoc(9, xs);
-    Tail(xs);
-    cout << head(xs) << endl;
+    
 }
 

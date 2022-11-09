@@ -110,10 +110,12 @@ void DisposeIterator(ListIterator ixs) {
 void DestroyL(LinkedList xs) {
     if (xs->cantidad > 0) {
         NodoL* temp = xs->primero->siguiente;
-        while (xs->primero != NULL) {
+        while (temp != NULL) {
             delete xs->primero;
-            xs->primero = temp; 
+            xs->primero = temp;
+            temp = temp->siguiente;
         }
+        delete xs->primero;
     }
     delete xs;
 }
