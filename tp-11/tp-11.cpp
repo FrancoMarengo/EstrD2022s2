@@ -1,6 +1,9 @@
 #include <iostream>
 #include "LinkedList.h"
 #include "Set.h"
+#include "Queue.h"
+#include "Tree.h"
+#include "ArrayList.h"
 using namespace std;
 
 // Linked Lists
@@ -117,13 +120,104 @@ LinkedList copy(LinkedList xs) {
 // Set
 // Ejercicio 4
 
+// Resuelto en Set.h y Set.cpp
+
+// Queue
+// Ejercicio 5
+
+// Resuelto en Queue.h y Queue.cpp
+
+// Arboles binarios 
+// Ejercicio 6
+
+// Dado un árbol binario de enteros devuelve la suma entre sus elementos.
+int sumarT(Tree t) {
+    int sum = 0;
+    if (!isEmptyT(t)) {
+        sum += rootT(t);
+        sum += sumarT(left(t));
+        sum += sumarT(right(t));
+    }
+    return sum;
+}
+
+// Dado un árbol binario devuelve su cantidad de elementos, es decir, el tamaño del árbol (size
+// en inglés).
+int sizeT(Tree t) {
+    int s = 0;
+    if (isEmptyT(t)) {
+        s += 1 + sizeT(left(t)) + sizeT(right(t));
+    }
+    return s;
+}
+
+// Dados un elemento y un árbol binario devuelve True si existe un elemento igual a ese en el
+// árbol.
+bool perteneceT(int e, Tree t) {
+    bool pertenece = false;
+    if (!isEmptyT(t)) {
+        pertenece |= (rootT(t) == e)        
+                  || perteneceT(e, left(t)) 
+                  || perteneceT(e, right(t));
+    }
+    return pertenece;
+}
+
+// (funcion auxiliar)
+// Retorna 1 si el booleano dado es true o 0 si es false.
+int unoSi(bool b) {
+    if (b) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+// Dados un elemento e y un árbol binario devuelve la cantidad de elementos del árbol que son
+// iguales a e.
+int aparicionesT(int e, Tree t) {
+    int ap = 0;
+    if (!isEmptyT(t)) {
+        ap += unoSi(rootT(t) == e) + aparicionesT(e, left(t))
+                                   + aparicionesT(e, right(t));
+    }
+    return ap;
+}
+
+// Dado un árbol devuelve su altura.
+int heightT(Tree t) {
+    if (heightT(left(t)) > heightT(right(t))) {
+        return 1 + heightT(left(t));
+    } else {
+        return 1 + heightT(right(t));
+    }
+}
+
+// Dado un árbol devuelve una lista con todos sus elementos.
+ArrayList toList(Tree t) {
+    // Preguntar si no conviene usar la interfaz de LinkedList para hacer merge y
+    // para tener una interfaz útil que no genere memory leaks.
+    return newArrayList();
+}
+
+// Dado un árbol devuelve los elementos que se encuentran en sus hojas.
+ArrayList leaves(Tree t) {
+    if (!isEmptyT(t) && isEmptyT(left(t)) && isEmptyT(right(t))) {
+        ArrayList al = newArrayList();
+        add(rootT(t), al);
+        return al;
+    } else if (!isEmptyT(t)) {
+    //    return merge(leaves(left(t)), leaves(right(t)));
+    }
+}
+
+// Dados un número n y un árbol devuelve una lista con los nodos de nivel n
+ArrayList levelN(int n, Tree t) {
+    return newArrayList();
+}
+
 
 int main() {
-    Set s = emptyS();
-    AddS(2, s);
-    RemoveS(2, s);
-    AddS(4, s);
-    LinkedList xs = setToList(s);
-    cout << head(xs) << endl;
+    
 }
 
