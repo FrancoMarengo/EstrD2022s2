@@ -7,11 +7,11 @@ using namespace std;
 #include "Cliente.h"
 #include "Clientes.h"
 struct SNode {
-    Cliente conexion; // OBS: si es NULL, está disponible.
-    SNode*  boca1;
-    SNode*  boca2;
-    // INV.REP.:
-    //  * (BONUS) uno de los 3 campos es distinto de NULL
+  Cliente conexion; // OBS: si es NULL, está disponible.
+  SNode*  boca1;
+  SNode*  boca2;
+  // INV.REP.:
+  //  * (BONUS) uno de los 3 campos es distinto de NULL
 };
 
 struct  SwHeaderSt {
@@ -25,11 +25,48 @@ Switch newSwitch() {
 }
 
 void Conectar(Cliente c, Ruta r, Switch s) {
-  // COMPLETAR
+  RutaIterator ri = iniciarRuta(r);
+  if(s->root == NULL) {
+    SNode* newN = new SNode;
+    newN->conexion = NULL;
+    newN->boca1    = NULL;
+    newN->boca2    = NULL;
+    s->root = newN;
+  }
+  SNode* currentN = s->root;
+  while(!estaAlFinalDeLaRuta(ri)) {
+    if(bocaActual(ri) == 1) {
+      if(currentN->boca1 == NULL) {
+        SNode* newN = new SNode;
+        newN->conexion = NULL;
+        newN->boca1    = NULL;
+        newN->boca2    = NULL;
+        currentN->boca1 = newN;
+        currentN = currentN ->boca1;
+      }
+    } else if (bocaActual(ri) == 2) {
+      if(currentN->boca2 == NULL) {
+        SNode* newN = new SNode;
+        newN->conexion = NULL;
+        newN->boca1    = NULL;
+        newN->boca2    = NULL;
+        currentN->boca2 = newN;
+        currentN = currentN->boca2;
+      }
+    }
+    AvanzarEnRuta(ri);
+  }
+  if(currentN->conexion == NULL) {
+    currentN->conexion = c;
+  } else {
+    cout << "Error" << endl;
+    exit(2);
+  }
+  LiberarRutaIterator(ri);
 }
 
 void Desconectar(Ruta r, Switch s) {
-  // COMPLETAR
+  
 }
 
 Rutas disponiblesADistancia(Switch s, int d) {
