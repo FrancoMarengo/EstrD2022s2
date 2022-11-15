@@ -22,18 +22,17 @@ struct  DNHeaderSt {
 };
 
 DualNet emptyDN() {
-  // COMPLETAR
-  return(NULL);
+  DNHeaderSt* dn = new DNHeaderSt;
+  dn->mcr = emptyMCR();
+  dn->sw = newSwitch();
 }
 
 int cantidadDeClientesConectados(DualNet dn) {
-  // COMPLETAR
-  return(0); // REEMPLAZAR
+  return sizeMCR(dn->mcr);
 }
 
 bool estaDisponible(Ruta r, DualNet dn) {
-  // COMPLETAR
-  return(false); // REEMPLAZAR
+  disponiblesADistancia(dn->sw, lenRuta(r));
 }
 
 void ConectarCliente(Ruta r, Cliente c, DualNet dn) {

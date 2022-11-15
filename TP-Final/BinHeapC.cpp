@@ -33,8 +33,7 @@ struct BinHeapHeaderSt{
 };
 
 BinHeapC emptyHC() { // O(1)
-  // COMPLETAR
-  return(NULL); // REEMPLAZAR
+  return NULL;
 }
 
 bool isEmptyHC(BinHeapC h) {  // O(1)

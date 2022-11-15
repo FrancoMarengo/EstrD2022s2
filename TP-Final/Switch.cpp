@@ -66,17 +66,53 @@ void Conectar(Cliente c, Ruta r, Switch s) {
 }
 
 void Desconectar(Ruta r, Switch s) {
-  
-}
+  RutaIterator ri = iniciarRuta(r);
+  SNode* currentN = s->root;
+  while(currentN != NULL && !estaAlFinalDeLaRuta(ri)) {
+    if(bocaActual(ri) == 1) {
+      currentN = currentN->boca1;
+    } else if (bocaActual(ri) == 2) {
+      currentN = currentN->boca2;
+    }
+    AvanzarEnRuta(ri);
+  }
+  if(currentN == NULL) { } 
+  else if(currentN->conexion != NULL) { 
+    currentN->conexion = NULL;
+  }
+  LiberarRutaIterator(ri);
+}  
 
 Rutas disponiblesADistancia(Switch s, int d) {
-  // COMPLETAR
-  return (NULL); // REEMPLAZAR
+  return NULL;
 }
 
 void LiberarSwitch(Switch s) {
-  // COMPLETAR
+  QNodeSw* current;
+  Ruta   r;
+  NextsQueueSw aProcesar = emptyQSw();
+  if(s->root != NULL) {
+    EnqueueQSw(aProcesar, rutaVacia(), s->root);
+  }
+  while(! isEmptyQSw(aProcesar)) {
+    current = DequeueFirstQSw(aProcesar);
+    if(current->node->boca1 != NULL) { 
+      r = copiarRuta(current->ruta);
+      SnocBoca(r, Boca1);
+      EnqueueQSw(aProcesar, r, current->node->boca1);
+    }
+    if(current->node->boca2 != NULL) { 
+      r = copiarRuta(current->ruta);
+      SnocBoca(r, Boca2);
+      EnqueueQSw(aProcesar, r, current->node->boca2);
+    }
+    delete current->node;
+    LiberarRuta(current->ruta);
+  }
+  LiberarQSw(aProcesar);
+  delete s;
 }
+
 
 //------------------------------------------------------------
 // ESTRUCTURA AUXILIAR COLA DE SIGUIENTES PARA RECORRER LINEALMENTE EL SWITCH
@@ -140,6 +176,7 @@ void LiberarQSw(NextsQueueSw q) {
   }
   delete(q);
 }
+
 //------------------------------------------------------------
 // FIN IMPLEMENTACION DE COLA DE SIGUIENTES
 //------------------------------------------------------------
