@@ -24,6 +24,7 @@ Switch newSwitch() {
   return (sw);
 }
 
+// Precond
 void Conectar(Cliente c, Ruta r, Switch s) {
   RutaIterator ri = iniciarRuta(r);
   if(s->root == NULL) {
@@ -56,12 +57,7 @@ void Conectar(Cliente c, Ruta r, Switch s) {
     }
     AvanzarEnRuta(ri);
   }
-  if(currentN->conexion == NULL) {
-    currentN->conexion = c;
-  } else {
-    cout << "Error" << endl;
-    exit(2);
-  }
+  currentN->conexion = c;
   LiberarRutaIterator(ri);
 }
 
@@ -81,38 +77,7 @@ void Desconectar(Ruta r, Switch s) {
     currentN->conexion = NULL;
   }
   LiberarRutaIterator(ri);
-}  
-
-Rutas disponiblesADistancia(Switch s, int d) {
-  return NULL;
-}
-
-void LiberarSwitch(Switch s) {
-  QNodeSw* current;
-  Ruta   r;
-  NextsQueueSw aProcesar = emptyQSw();
-  if(s->root != NULL) {
-    EnqueueQSw(aProcesar, rutaVacia(), s->root);
-  }
-  while(! isEmptyQSw(aProcesar)) {
-    current = DequeueFirstQSw(aProcesar);
-    if(current->node->boca1 != NULL) { 
-      r = copiarRuta(current->ruta);
-      SnocBoca(r, Boca1);
-      EnqueueQSw(aProcesar, r, current->node->boca1);
-    }
-    if(current->node->boca2 != NULL) { 
-      r = copiarRuta(current->ruta);
-      SnocBoca(r, Boca2);
-      EnqueueQSw(aProcesar, r, current->node->boca2);
-    }
-    delete current->node;
-    LiberarRuta(current->ruta);
-  }
-  LiberarQSw(aProcesar);
-  delete s;
-}
-
+} 
 
 //------------------------------------------------------------
 // ESTRUCTURA AUXILIAR COLA DE SIGUIENTES PARA RECORRER LINEALMENTE EL SWITCH
@@ -175,6 +140,63 @@ void LiberarQSw(NextsQueueSw q) {
     delete(temp);
   }
   delete(q);
+}
+
+Rutas disponiblesADistancia(Switch s, int d) {
+  Rutas disponiblesADistancia = emptyRutas();
+  QNodeSw* current;
+  Ruta r1;
+  Ruta r2;
+  NextsQueueSw aProcesar = emptyQSw();
+  EnqueueQSw(aProcesar, rutaVacia(), s->root);
+  while(! isEmptyQSw(aProcesar)) {
+    current = DequeueFirstQSw(aProcesar);
+    r1 = copiarRuta(current->ruta);
+    SnocBoca(r1, Boca1);
+    r2 = copiarRuta(current->ruta);
+    SnocBoca(r2, Boca2);
+    if(lenRuta(r1) <= d && current->node == NULL) {
+      EnqueueQSw(aProcesar, r1, NULL);
+      EnqueueQSw(aProcesar, r2, NULL);
+    } else if(lenRuta(r1) <= d && current->node != NULL) {
+      EnqueueQSw(aProcesar, r1, current->node->boca1);
+      EnqueueQSw(aProcesar, r2, current->node->boca2);
+    }
+    if(lenRuta(current->ruta) == d && (current->node == NULL || current->node->conexion == NULL)) {
+      SnocRuta(disponiblesADistancia, current->ruta);
+    } else {
+      LiberarRuta(current->ruta);
+    } 
+    delete current->node;
+  }
+  LiberarQSw(aProcesar);
+  return disponiblesADistancia;
+}
+
+void LiberarSwitch(Switch s) {
+  QNodeSw* current;
+  Ruta r;
+  NextsQueueSw aProcesar = emptyQSw();
+  if(s->root != NULL) {
+    EnqueueQSw(aProcesar, rutaVacia(), s->root);
+  }
+  while(! isEmptyQSw(aProcesar)) {
+    current = DequeueFirstQSw(aProcesar);
+    if(current->node->boca1 != NULL) { 
+      r = copiarRuta(current->ruta);
+      SnocBoca(r, Boca1);
+      EnqueueQSw(aProcesar, r, current->node->boca1);
+    }
+    if(current->node->boca2 != NULL) { 
+      r = copiarRuta(current->ruta);
+      SnocBoca(r, Boca2);
+      EnqueueQSw(aProcesar, r, current->node->boca2);
+    }
+    delete current->node;
+    LiberarRuta(current->ruta);
+  }
+  LiberarQSw(aProcesar);
+  delete s;
 }
 
 //------------------------------------------------------------

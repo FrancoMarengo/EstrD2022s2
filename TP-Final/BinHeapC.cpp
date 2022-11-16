@@ -9,6 +9,7 @@ using namespace std;
 
 #define MIN_DATA INT_MIN
                  // Macro definida en limits.h
+#define MIN_CLIENTE cliente("");
 
 struct BinHeapHeaderSt{
   int      maxSize;
@@ -33,24 +34,28 @@ struct BinHeapHeaderSt{
 };
 
 BinHeapC emptyHC() { // O(1)
-  return NULL;
+  BinHeapHeaderSt* h = new BinHeapHeaderSt;
+  int* pins = new int[16];
+  Cliente* clientes = new Cliente[16];
+  h->maxSize = 16;
+  h->curSize = 0;
+  h->pins = pins;
+  h->clientes = clientes;
+  h->pins[0] = MIN_DATA;
+  h->clientes[0] = MIN_CLIENTE;
+  return h;
 }
 
 bool isEmptyHC(BinHeapC h) {  // O(1)
-  // COMPLETAR
-  return(false); // REEMPLAZAR
+  return h->curSize == 0;
 }
 
 int  findMinPinHC(BinHeapC h) { // O(1)
-  // PRECOND: la heap no está vacía
-  // COMPLETAR
-  return(0); // REEMPLAZAR
+  return h->pins[1];
 }
 
 Cliente findMinClienteHC(BinHeapC h) { // O(1)
-  // PRECOND: la heap no está vacía
-  // COMPLETAR
-  return(NULL); // REEMPLAZAR
+  return h->clientes[1];
 }
 
 //---------------------------------------
@@ -58,20 +63,59 @@ Cliente findMinClienteHC(BinHeapC h) { // O(1)
 //  en caso de ser necesario
 //---------------------------------------
 void AumentarEspacio(BinHeapC h) { // O(N)
-  // COMPLETAR
+  h->maxSize = h->maxSize*2;
+  int* tempPns = new int[h->maxSize];
+  Cliente* tempCls = new Cliente[h->maxSize];
+  tempPns[0] = MIN_DATA;
+  tempCls[0] = MIN_CLIENTE;
+  for(int i = 1; i <= h->curSize; i++) {
+    tempPns[i] = h->pins[i];
+    tempCls[i] = h->clientes[i];
+  }
+  delete h->pins;
+  delete h->clientes;
+  h->pins = tempPns;
+  h->clientes = tempCls;
 }
 
 void InsertHC(int pin, Cliente c, BinHeapC h) { // O(log N)
-  // COMPLETAR
+  if(h->curSize==h->maxSize-1) { AumentarEspacio(h); }
+  int curNode = ++h->curSize;
+  while(pin < h->pins[curNode/2]) {
+    h->pins[curNode] = h->pins[curNode/2];
+    h->clientes[curNode] = h->clientes[curNode/2];
+    curNode /= 2;
+  }
+  if(pin == h->pins[curNode/2] && esClienteMayor(c, h->clientes[curNode/2])) {
+    h->pins[curNode] = h->pins[curNode/2];
+    h->clientes[curNode] = h->clientes[curNode/2];
+    curNode /= 2;
+  }
+  h->clientes[curNode] = c;
+  h->curSize++;
 }
 
+// PRECOND: h->curSize > 0
 void DeleteMinHC(BinHeapC h) { // O(log N)
-  // PRECOND: h->curSize > 0
-  // COMPLETAR
+  int child; int curNode;
+  int last = h->pins[h->curSize--];
+  for(curNode=1; curNode*2 <= h->curSize; curNode=child) {
+    child = curNode*2;
+    if ((child != h->curSize) && (h->pins[child+1] < h->pins[child])) { 
+      child++; 
+    }
+    if (last > h->pins[child]) { 
+      h->pins[curNode] = h->pins[child]; 
+    }
+    else { break; }
+  }
+  h->pins[curNode] = last;
 }
 
 void LiberarHC(BinHeapC h) { // O(1)
-  // COMPLETAR
+  delete h->clientes;
+  delete h->pins;
+  delete h;
 }
 
 //---------------------------------------
