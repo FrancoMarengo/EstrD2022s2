@@ -35,8 +35,8 @@ struct BinHeapHeaderSt{
 
 BinHeapC emptyHC() { // O(1)
   BinHeapHeaderSt* h = new BinHeapHeaderSt;
-  int* pins = new int[16];
-  Cliente* clientes = new Cliente[16];
+  int* pins = new int[17];
+  Cliente* clientes = new Cliente[17];
   h->maxSize = 16;
   h->curSize = 0;
   h->pins = pins;
@@ -80,13 +80,8 @@ void AumentarEspacio(BinHeapC h) { // O(N)
 
 void InsertHC(int pin, Cliente c, BinHeapC h) { // O(log N)
   if(h->curSize==h->maxSize-1) { AumentarEspacio(h); }
-  int curNode = ++h->curSize;
-  while(pin < h->pins[curNode/2]) {
-    h->pins[curNode] = h->pins[curNode/2];
-    h->clientes[curNode] = h->clientes[curNode/2];
-    curNode /= 2;
-  }
-  if(pin == h->pins[curNode] && esClienteMayor(h->clientes[curNode], c)) {
+  int curNode = h->curSize + 1;
+  while(pin < h->pins[curNode/2] || (pin == h->pins[curNode/2] && esClienteMayor(h->clientes[curNode/2], c))) {
     h->pins[curNode] = h->pins[curNode/2];
     h->clientes[curNode] = h->clientes[curNode/2];
     curNode /= 2;
