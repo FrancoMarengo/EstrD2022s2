@@ -86,11 +86,12 @@ void InsertHC(int pin, Cliente c, BinHeapC h) { // O(log N)
     h->clientes[curNode] = h->clientes[curNode/2];
     curNode /= 2;
   }
-  if(pin == h->pins[curNode/2] && esClienteMayor(c, h->clientes[curNode/2])) {
+  if(pin == h->pins[curNode] && esClienteMayor(h->clientes[curNode], c)) {
     h->pins[curNode] = h->pins[curNode/2];
     h->clientes[curNode] = h->clientes[curNode/2];
     curNode /= 2;
   }
+  h->pins[curNode] = pin;
   h->clientes[curNode] = c;
   h->curSize++;
 }
@@ -101,15 +102,18 @@ void DeleteMinHC(BinHeapC h) { // O(log N)
   int last = h->pins[h->curSize--];
   for(curNode=1; curNode*2 <= h->curSize; curNode=child) {
     child = curNode*2;
-    if ((child != h->curSize) && (h->pins[child+1] < h->pins[child])) { 
+    if (((child != h->curSize) && (h->pins[child+1] < h->pins[child]))
+    || ((h->pins[child+1] == h->pins[child]) && esClienteMayor(h->clientes[child], h->clientes[child+1]))) { 
       child++; 
     }
-    if (last > h->pins[child]) { 
-      h->pins[curNode] = h->pins[child]; 
-    }
-    else { break; }
+    if (last > h->pins[child] 
+    || (last == h->pins[child] && esClienteMayor(h->clientes[h->curSize], h->clientes[child]))) { 
+      h->pins[curNode] = h->pins[child];
+      h->clientes[curNode] = h->clientes[child]; 
+    } else { break; }
   }
   h->pins[curNode] = last;
+  h->clientes[curNode] = h->clientes[h->curSize];
 }
 
 void LiberarHC(BinHeapC h) { // O(1)
