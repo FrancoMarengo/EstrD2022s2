@@ -97,7 +97,7 @@ BinHeapC pinPorCliente(DualNet dn) {
 }
 
 /* Propósito: Libera el DualNet dado de memoria.
-   Eficiencia: O(1).
+   Eficiencia: O(r) siendo r todas los nodos del switch.
 */
 void LiberarDN(DualNet dn) {
   LiberarMCR(dn->mcr);

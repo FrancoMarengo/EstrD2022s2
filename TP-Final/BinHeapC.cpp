@@ -29,6 +29,8 @@ struct BinHeapHeaderSt{
       * los valores (pins[i], clientes[i]) corresponden a los diferentes elementos,
         para 1<=i<=curSize
       * se usará el nombre N como sinónimo de curSize
+      * Al momento de comparar pares se tiene en cuenta principalmente el pin, 
+        pero en caso de empate, se tiene en cuenta también el Cliente.
   */
 };
 
@@ -46,7 +48,7 @@ BinHeapC emptyHC() {
   h->pins = pins;
   h->clientes = clientes;
   h->pins[0] = MIN_DATA;
-  h->clientes[0] = NULL;
+  h->clientes[0] = NULL;  // Se considera NULL como centinela en clientes
   return h;
 }
 
@@ -87,10 +89,10 @@ void AumentarEspacio(BinHeapC h) {
   int* tempPns = new int[h->maxSize];
   Cliente* tempCls = new Cliente[h->maxSize];
   tempPns[0] = MIN_DATA;
-  tempCls[0] = NULL;
+  tempCls[0] = NULL;  // Se considera NULL centinela de clientes.
   for(int i = 1; i <= h->curSize; i++) {
-    tempPns[i] = h->pins[i];
-    tempCls[i] = h->clientes[i];
+    tempPns[i] = h->pins[i];     // Se copian en ambos arrays nuevos los elementos
+    tempCls[i] = h->clientes[i]; // de los arrays anteriores.
   }
   delete h->pins;
   delete h->clientes;

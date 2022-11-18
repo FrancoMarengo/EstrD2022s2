@@ -101,7 +101,7 @@ Switch newSwitch() {
 */
 void Conectar(Cliente c, Ruta r, Switch s) {
   RutaIterator ri = iniciarRuta(r);
-  if(s->root == NULL) {
+  if(s->root == NULL) {  // Caso en que root sea NULL.
     SNode* newN = new SNode;
     newN->conexion = NULL;
     newN->boca1    = NULL;
@@ -109,16 +109,16 @@ void Conectar(Cliente c, Ruta r, Switch s) {
     s->root = newN;
   }
   SNode* currentN = s->root;
-  while(!estaAlFinalDeLaRuta(ri)) {
-    if(bocaActual(ri) == 1) {
+  while(!estaAlFinalDeLaRuta(ri)) {  // Recorre la ruta y si se deben agregar 
+    if(bocaActual(ri) == 1) {        // SNode lo hace.
       if(currentN->boca1 == NULL) {
         SNode* newN = new SNode;
         newN->conexion = NULL;
         newN->boca1    = NULL;
         newN->boca2    = NULL;
-        currentN->boca1 = newN;
-        currentN = currentN ->boca1;
+        currentN->boca1 = newN; 
       }
+      currentN = currentN->boca1;
     } else if (bocaActual(ri) == 2) {
       if(currentN->boca2 == NULL) {
         SNode* newN = new SNode;
@@ -126,8 +126,8 @@ void Conectar(Cliente c, Ruta r, Switch s) {
         newN->boca1    = NULL;
         newN->boca2    = NULL;
         currentN->boca2 = newN;
-        currentN = currentN->boca2;
       }
+      currentN = currentN->boca2;
     }
     AvanzarEnRuta(ri);
   }
@@ -140,23 +140,29 @@ void Conectar(Cliente c, Ruta r, Switch s) {
   LiberarRutaIterator(ri);
 }
 
+// FUNCION AUXILIAR
+/* Propósito: Verifica que el SNode en la ruta dada sea NULL si conexion, boca1 y boca2
+              son NULL, si no, lo convierte en NULL.
+   Eficiencia: O(log R) siendo R la totalidad de los nodos del Switch.
+   OBS: 
+*/
 void verificarConmutadorEnRuta(Ruta r, Switch s) {
-  RutaIterator ri = iniciarRuta(r);
-  RutaIterator rPar = iniciarRuta(r);
-  if(!estaAlFinalDeLaRuta(rPar)) {
-    AvanzarEnRuta(rPar);
+  RutaIterator ri = iniciarRuta(r);   // Inicia un iterador de la Ruta dada
+  RutaIterator ra = iniciarRuta(r); // Inicia otro iterador de la Ruta dada
+  if(!estaAlFinalDeLaRuta(ra)) {    // pero lo adelanta un lugar si se puede.
+    AvanzarEnRuta(ra);
   }
   SNode* currentN = s->root;
-  while(!estaAlFinalDeLaRuta(rPar)) {
-    if(bocaActual(ri) == 1) {
+  while(!estaAlFinalDeLaRuta(ra)) {  // Va eligiendo bocas hasta que el iterador
+    if(bocaActual(ri) == 1) {          // adelantado llegue al final
       currentN = currentN->boca1;
     } else if (bocaActual(ri) == 2) {
       currentN = currentN->boca2;
     }
-    AvanzarEnRuta(rPar);
-    AvanzarEnRuta(ri);
-  }
-  if(estaAlFinalDeLaRuta(ri)) {
+    AvanzarEnRuta(ra);
+    AvanzarEnRuta(ri);    // Tambien se va avanzando en el iterador no adelantado.
+  }                       // Procede a dejar en NULL la siguiente boca en el iterador no adelantado si cumple la cond.
+  if(estaAlFinalDeLaRuta(ri)) {  // Caso en el que la ruta fuera vacía.
     if(s->root->boca1 == NULL && s->root->boca2 == NULL && s->root->conexion == NULL) {
       s->root = NULL;
     }
@@ -170,6 +176,7 @@ void verificarConmutadorEnRuta(Ruta r, Switch s) {
     }
   }
   LiberarRutaIterator(ri);
+  LiberarRutaIterator(ra);
 }
 
 // FUNCION AUXILIAR
@@ -181,8 +188,7 @@ void verificarConmutadorEnRuta(Ruta r, Switch s) {
 void verificarConmutadoresEnRutas(Rutas rs, Switch s) {
   RutasIterator ri = iniciarRecorridoDeRutas(rs);
   while(!estaAlFinalDeLasRutas(ri)) {
-    verificarConmutadorEnRuta(rutaActual(ri), s);
-    LiberarRuta(rutaActual(ri));
+    verificarConmutadorEnRuta(rutaActual(ri), s); 
     AvanzarASiguienteRuta(ri);
   }
   LiberarRutasIterator(ri);
@@ -198,31 +204,34 @@ void Desconectar(Ruta r, Switch s) {
   RutaIterator ri = iniciarRuta(r);
   Rutas rs = emptyRutas();
   Ruta ruta = rutaVacia();
-  SNode* currentN = s->root;
-  ConsRuta(ruta, rs);
+  SNode* currentN = s->root;  
+  ConsRuta(ruta, rs);  // Agrega ruta vacía a rutas, ya que se espera recorrer siempre en caso de desconectar
   while(currentN != NULL && !estaAlFinalDeLaRuta(ri)) {
-    ruta = copiarRuta(ruta);
-    if(bocaActual(ri) == 1) {
+    ruta = copiarRuta(ruta);      // Crea una ruta nueva y la asigna, posteriormente le
+    if(bocaActual(ri) == 1) {     // agrega una boca dependiendo del camino a tomar según r
       currentN = currentN->boca1;
       SnocBoca(ruta, Boca1);
     } else if (bocaActual(ri) == 2) {
       currentN = currentN->boca2;
       SnocBoca(ruta, Boca2);
     }
-    ConsRuta(ruta, rs);
+    ConsRuta(ruta, rs);   // Agrega la ruta anteriormente creada al principio de la lista
     AvanzarEnRuta(ri);
   }
-  if(currentN == NULL) { } 
+  if(currentN == NULL) { }  // Si la ruta dada no existe entonces no se hace nada.
   else if(currentN->conexion != NULL) { 
-    currentN->conexion = NULL;
-    verificarConmutadoresEnRutas(rs, s);
-  }
-  LiberarRutaIterator(ri);
+    currentN->conexion = NULL;           // Si la ruta existe y la conexion esta ocupada entonces 
+    verificarConmutadoresEnRutas(rs, s); // se recorren las rutas anteriormente guardadas 
+  }                                      // que representan cada boca tomada en sentido inverso
+  LiberarRutas(rs);                      // para asegurar que ningún SNode quede inconsistente
+  LiberarRutaIterator(ri);               // con sus 3 campos en NULL.
 } 
 
 /* Propósito: Retorna Rutas disponibles a la distancia dada en el Switch dado.
    Eficiencia: O(R) siendo R todos los elementos del Switch dado.
-   OBS: Se tienen en cuenta las rutas todavía no creadas en el Switch.
+   OBS: 
+    * Se tienen en cuenta las rutas no alcanzables en el Switch.
+    * Se recorre el Switch usando BFS de izquierda a derecha.
 */
 Rutas disponiblesADistancia(Switch s, int d) {
   Rutas disponiblesADistancia = emptyRutas();
@@ -230,26 +239,26 @@ Rutas disponiblesADistancia(Switch s, int d) {
   Ruta r1;
   Ruta r2;
   NextsQueueSw aProcesar = emptyQSw();
-  EnqueueQSw(aProcesar, rutaVacia(), s->root);
+  EnqueueQSw(aProcesar, rutaVacia(), s->root); 
   while(! isEmptyQSw(aProcesar)) {
     current = DequeueFirstQSw(aProcesar);
-    r1 = copiarRuta(current->ruta);
-    SnocBoca(r1, Boca1);
+    r1 = copiarRuta(current->ruta);  // Se agregan las dos bocas de current
+    SnocBoca(r1, Boca1);             // independientemente si existan o sean alcanzables
     r2 = copiarRuta(current->ruta);
     SnocBoca(r2, Boca2);
-    if(lenRuta(r1) <= d && current->node == NULL) {
-      EnqueueQSw(aProcesar, r1, NULL);
+    if(lenRuta(r1) <= d && current->node == NULL) {  // Si no son alcanzables se agregan las bocas
+      EnqueueQSw(aProcesar, r1, NULL);               //  en la queue con nodos NULL.
       EnqueueQSw(aProcesar, r2, NULL);
     } else if(lenRuta(r1) <= d && current->node != NULL) {
-      EnqueueQSw(aProcesar, r1, current->node->boca1);
-      EnqueueQSw(aProcesar, r2, current->node->boca2);
+      EnqueueQSw(aProcesar, r1, current->node->boca1);  // Si son alcanzables se agregan a la queue
+      EnqueueQSw(aProcesar, r2, current->node->boca2);  // con sus respectivos nodos, sean NULL o no.
     }
     if(lenRuta(current->ruta) == d && (current->node == NULL || current->node->conexion == NULL)) {
-      SnocRuta(disponiblesADistancia, current->ruta);
-    } else {
-      LiberarRuta(current->ruta);
+      SnocRuta(disponiblesADistancia, current->ruta);  // Si la ruta en current cumple con la distancia
+    } else {                                           // pedida se agrega al resultado, si no se libera
+      LiberarRuta(current->ruta);                      // de memoria.
     } 
-    delete current->node;
+    delete current->node;  // Se libera el nodo en todos los casos ya que no se necesita
   }
   LiberarQSw(aProcesar);
   return disponiblesADistancia;
@@ -257,13 +266,14 @@ Rutas disponiblesADistancia(Switch s, int d) {
 
 /* Propósito: Libera el Switch dado de memoria.
    Eficiencia: O(R).
+   OBS: Se recorre el Switch usando BFS de izquierda a derecha.
 */
 void LiberarSwitch(Switch s) {
   QNodeSw* current;
   Ruta r;
   NextsQueueSw aProcesar = emptyQSw();
-  if(s->root != NULL) {
-    EnqueueQSw(aProcesar, rutaVacia(), s->root);
+  if(s->root != NULL) {  // Se asegura que el Switch no sea terminal.
+    EnqueueQSw(aProcesar, rutaVacia(), s->root); 
   }
   while(! isEmptyQSw(aProcesar)) {
     current = DequeueFirstQSw(aProcesar);
@@ -277,7 +287,7 @@ void LiberarSwitch(Switch s) {
       SnocBoca(r, Boca2);
       EnqueueQSw(aProcesar, r, current->node->boca2);
     }
-    delete current->node;
+    delete current->node;  // Borra cada nodo procesado.
     LiberarRuta(current->ruta);
   }
   LiberarQSw(aProcesar);
