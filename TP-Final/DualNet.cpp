@@ -21,6 +21,9 @@ struct  DNHeaderSt {
   */
 };
 
+/* Propósito: Retorna un DualNet vacío.
+   Eficiencia: O(1).
+*/
 DualNet emptyDN() {
   DNHeaderSt* dn = new DNHeaderSt;
   dn->mcr = emptyMCR();
@@ -28,10 +31,17 @@ DualNet emptyDN() {
   return dn;
 }
 
+/* Propósito: Retorna la cantidad de clientes conectados en el DualNet dado.
+   Eficiencia: O(1).
+*/
 int cantidadDeClientesConectados(DualNet dn) {
   return sizeMCR(dn->mcr);
 }
 
+/* Propósito: Indica si la Ruta dada se encuentra disponible en el DualNet dado.
+   Eficiencia: O(r) siendo r la cantidad de rutas disponibles a una distancia, 
+                    y siendo esta distancia la longitud de la Ruta dada.
+*/
 bool estaDisponible(Ruta r, DualNet dn) {
   Rutas rs = disponiblesADistancia(dn->sw, lenRuta(r));
   RutasIterator ri = iniciarRecorridoDeRutas(rs);
@@ -44,6 +54,10 @@ bool estaDisponible(Ruta r, DualNet dn) {
   return(disponible);
 }
 
+/* Propósito: Conecta a un cliente dado en una Ruta dada en el DualNet dado.
+   Precond: La Ruta dada debe estar disponible.
+   Eficiencia: O(log C) siendo C la cantidad de clientes del DualNet.
+*/
 void ConectarCliente(Ruta r, Cliente c, DualNet dn) {
   Ruta rutaAnterior = lookupMCR(c, dn->mcr);
   if(rutaAnterior != NULL) {
@@ -53,14 +67,22 @@ void ConectarCliente(Ruta r, Cliente c, DualNet dn) {
   AddMCR(c, r, dn->mcr);
 }
 
+/* Propósito: Desconecta al Cliente dado del DualNet.
+   Eficiencia: O(log C) siendo C la cantidad de clientes del DualNet.
+   OBS: Si el Cliente no estaba conectado en el DualNet, entonces no hace nada.
+*/
 void DesconectarCliente(Cliente c, DualNet dn) {
-  Ruta rutaAnterior = lookupMCR(c, dn->mcr);
-  if(rutaAnterior != NULL) {
-    Desconectar(rutaAnterior, dn->sw);
+  Ruta rutaCliente = lookupMCR(c, dn->mcr);
+  if(rutaCliente != NULL) {
+    Desconectar(rutaCliente, dn->sw);
     DeleteMCR(c, dn->mcr);
   } 
 }
 
+/* Propósito: Retorna una BinHeapC con pares pin-Cliente por cada Cliente del DualNet dado y
+              cada longitud de Ruta asociada a estos Clientes.
+   Eficiencia: O(C log C) siendo C la cantidad de Clientes en el DualNet.
+*/
 BinHeapC pinPorCliente(DualNet dn) {
   BinHeapC h = emptyHC();
   ClientesIterator csi = iniciarRecorridoClientes(keysMCR(dn->mcr));
@@ -74,6 +96,9 @@ BinHeapC pinPorCliente(DualNet dn) {
   return h;
 }
 
+/* Propósito: Libera el DualNet dado de memoria.
+   Eficiencia: O(1).
+*/
 void LiberarDN(DualNet dn) {
   LiberarMCR(dn->mcr);
   LiberarSwitch(dn->sw);

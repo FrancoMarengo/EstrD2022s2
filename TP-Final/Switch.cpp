@@ -18,70 +18,10 @@ struct  SwHeaderSt {
   SNode* root;
 };
 
-Switch newSwitch() {
-  SwHeaderSt* sw = new SwHeaderSt;
-  sw->root = NULL;
-  return (sw);
-}
-
-// Precond
-void Conectar(Cliente c, Ruta r, Switch s) {
-  RutaIterator ri = iniciarRuta(r);
-  if(s->root == NULL) {
-    SNode* newN = new SNode;
-    newN->conexion = NULL;
-    newN->boca1    = NULL;
-    newN->boca2    = NULL;
-    s->root = newN;
-  }
-  SNode* currentN = s->root;
-  while(!estaAlFinalDeLaRuta(ri)) {
-    if(bocaActual(ri) == 1) {
-      if(currentN->boca1 == NULL) {
-        SNode* newN = new SNode;
-        newN->conexion = NULL;
-        newN->boca1    = NULL;
-        newN->boca2    = NULL;
-        currentN->boca1 = newN;
-        currentN = currentN ->boca1;
-      }
-    } else if (bocaActual(ri) == 2) {
-      if(currentN->boca2 == NULL) {
-        SNode* newN = new SNode;
-        newN->conexion = NULL;
-        newN->boca1    = NULL;
-        newN->boca2    = NULL;
-        currentN->boca2 = newN;
-        currentN = currentN->boca2;
-      }
-    }
-    AvanzarEnRuta(ri);
-  }
-  currentN->conexion = c;
-  LiberarRutaIterator(ri);
-}
-
-void Desconectar(Ruta r, Switch s) {
-  RutaIterator ri = iniciarRuta(r);
-  SNode* currentN = s->root;
-  while(currentN != NULL && !estaAlFinalDeLaRuta(ri)) {
-    if(bocaActual(ri) == 1) {
-      currentN = currentN->boca1;
-    } else if (bocaActual(ri) == 2) {
-      currentN = currentN->boca2;
-    }
-    AvanzarEnRuta(ri);
-  }
-  if(currentN == NULL) { } 
-  else if(currentN->conexion != NULL) { 
-    currentN->conexion = NULL;
-  }
-  LiberarRutaIterator(ri);
-} 
-
 //------------------------------------------------------------
 // ESTRUCTURA AUXILIAR COLA DE SIGUIENTES PARA RECORRER LINEALMENTE EL SWITCH
 //------------------------------------------------------------
+
 struct QNodeSw {
    SNode* node;
    Ruta   ruta;
@@ -142,6 +82,148 @@ void LiberarQSw(NextsQueueSw q) {
   delete(q);
 }
 
+//------------------------------------------------------------
+// FUNCIONES DE INTERFAZ DE SWITCH.
+//------------------------------------------------------------
+
+/* Propósito: Retorna un Switch vacío.
+   Eficiencia: O(1).
+*/
+Switch newSwitch() {
+  SwHeaderSt* sw = new SwHeaderSt;
+  sw->root = NULL;
+  return (sw);
+}
+
+/* Propósito: Conecta al Cliente dado a la Ruta dada en el Switch dado.
+   Precond: La Ruta dada debe estar disponible en el Switch dado.
+   Eficiencia: O(log R) siendo R los elementos del Switch dado.
+*/
+void Conectar(Cliente c, Ruta r, Switch s) {
+  RutaIterator ri = iniciarRuta(r);
+  if(s->root == NULL) {
+    SNode* newN = new SNode;
+    newN->conexion = NULL;
+    newN->boca1    = NULL;
+    newN->boca2    = NULL;
+    s->root = newN;
+  }
+  SNode* currentN = s->root;
+  while(!estaAlFinalDeLaRuta(ri)) {
+    if(bocaActual(ri) == 1) {
+      if(currentN->boca1 == NULL) {
+        SNode* newN = new SNode;
+        newN->conexion = NULL;
+        newN->boca1    = NULL;
+        newN->boca2    = NULL;
+        currentN->boca1 = newN;
+        currentN = currentN ->boca1;
+      }
+    } else if (bocaActual(ri) == 2) {
+      if(currentN->boca2 == NULL) {
+        SNode* newN = new SNode;
+        newN->conexion = NULL;
+        newN->boca1    = NULL;
+        newN->boca2    = NULL;
+        currentN->boca2 = newN;
+        currentN = currentN->boca2;
+      }
+    }
+    AvanzarEnRuta(ri);
+  }
+  if(currentN->conexion != NULL) {
+    cout << "Error: La conexión en la ruta dada no estaba disponible." << endl;
+    exit(1);
+  } else {
+    currentN->conexion = c;
+  }
+  LiberarRutaIterator(ri);
+}
+
+void verificarConmutadorEnRuta(Ruta r, Switch s) {
+  RutaIterator ri = iniciarRuta(r);
+  RutaIterator rPar = iniciarRuta(r);
+  if(!estaAlFinalDeLaRuta(rPar)) {
+    AvanzarEnRuta(rPar);
+  }
+  SNode* currentN = s->root;
+  while(!estaAlFinalDeLaRuta(rPar)) {
+    if(bocaActual(ri) == 1) {
+      currentN = currentN->boca1;
+    } else if (bocaActual(ri) == 2) {
+      currentN = currentN->boca2;
+    }
+    AvanzarEnRuta(rPar);
+    AvanzarEnRuta(ri);
+  }
+  if(estaAlFinalDeLaRuta(ri)) {
+    if(s->root->boca1 == NULL && s->root->boca2 == NULL && s->root->conexion == NULL) {
+      s->root = NULL;
+    }
+  } else if(bocaActual(ri) == 1) {
+    if(currentN->boca1->boca1 == NULL && currentN->boca1->boca2 == NULL && currentN->boca1->conexion == NULL) {
+      currentN->boca1 = NULL;
+    }
+  } else if (bocaActual(ri) == 2) {
+    if(currentN->boca2->boca1 == NULL && currentN->boca2->boca2 == NULL && currentN->boca2->conexion == NULL) {
+      currentN->boca2 = NULL;
+    }
+  }
+  LiberarRutaIterator(ri);
+}
+
+// FUNCION AUXILIAR
+/* Propósito: Convierte en NULL todos los SNode que tengan conexion, Boca1 y boca2
+              en NULL, recorriendo las Rutas dadas en el Switch dado.
+   Eficiencia: O(r * log R) siendo r la cantidad de Rutas en rs y R la cantidad total
+                            de rutas en el Switch dado.
+*/
+void verificarConmutadoresEnRutas(Rutas rs, Switch s) {
+  RutasIterator ri = iniciarRecorridoDeRutas(rs);
+  while(!estaAlFinalDeLasRutas(ri)) {
+    verificarConmutadorEnRuta(rutaActual(ri), s);
+    LiberarRuta(rutaActual(ri));
+    AvanzarASiguienteRuta(ri);
+  }
+  LiberarRutasIterator(ri);
+}
+
+/* Propósito: Desconecta la conexión de la Ruta dada en el Switch dado.
+   Precond: La Ruta dada debe existir en el Switch dado.
+   Eficiencia: O(r * log R) siendo r la cantidad de Rutas en rs y R la cantidad total
+                            de rutas en el Switch dado.
+   OBS: Si en la Ruta dada no hay ninguna conexión, entonces no hace nada.
+*/
+void Desconectar(Ruta r, Switch s) {
+  RutaIterator ri = iniciarRuta(r);
+  Rutas rs = emptyRutas();
+  Ruta ruta = rutaVacia();
+  SNode* currentN = s->root;
+  ConsRuta(ruta, rs);
+  while(currentN != NULL && !estaAlFinalDeLaRuta(ri)) {
+    ruta = copiarRuta(ruta);
+    if(bocaActual(ri) == 1) {
+      currentN = currentN->boca1;
+      SnocBoca(ruta, Boca1);
+    } else if (bocaActual(ri) == 2) {
+      currentN = currentN->boca2;
+      SnocBoca(ruta, Boca2);
+    }
+    ConsRuta(ruta, rs);
+    AvanzarEnRuta(ri);
+  }
+  if(currentN == NULL) { } 
+  else if(currentN->conexion != NULL) { 
+    currentN->conexion = NULL;
+    verificarConmutadoresEnRutas(rs, s);
+  }
+  LiberarRutaIterator(ri);
+} 
+
+/* Propósito: Retorna Rutas disponibles a la distancia dada en el Switch dado.
+   Eficiencia: O(R) siendo R todos los elementos del Switch dado.
+   OBS: Se tienen en cuenta las rutas todavía no creadas en el Switch.
+*/
 Rutas disponiblesADistancia(Switch s, int d) {
   Rutas disponiblesADistancia = emptyRutas();
   QNodeSw* current;
@@ -173,6 +255,9 @@ Rutas disponiblesADistancia(Switch s, int d) {
   return disponiblesADistancia;
 }
 
+/* Propósito: Libera el Switch dado de memoria.
+   Eficiencia: O(R).
+*/
 void LiberarSwitch(Switch s) {
   QNodeSw* current;
   Ruta r;
@@ -200,7 +285,7 @@ void LiberarSwitch(Switch s) {
 }
 
 //------------------------------------------------------------
-// FIN IMPLEMENTACION DE COLA DE SIGUIENTES
+// FUNCIONES DE SHOW DE SWITCH.
 //------------------------------------------------------------
 void PadSW(int offset) {
   for(int i=0; i<offset; i++) {
