@@ -56,7 +56,9 @@ bool estaDisponible(Ruta r, DualNet dn) {
 
 /* Propósito: Conecta a un cliente dado en una Ruta dada en el DualNet dado.
    Precond: La Ruta dada debe estar disponible.
-   Eficiencia: O(log C) siendo C la cantidad de clientes del DualNet.
+   Eficiencia: O(r * log N + log C) siendo r la ruta anterior del cliente dado, si es que la tiene,
+                                    N la totalidad de elementos en el Switch del DualNet y C la
+                                    cantidad de clientes del DualNet.
 */
 void ConectarCliente(Ruta r, Cliente c, DualNet dn) {
   Ruta rutaAnterior = lookupMCR(c, dn->mcr);
@@ -68,7 +70,9 @@ void ConectarCliente(Ruta r, Cliente c, DualNet dn) {
 }
 
 /* Propósito: Desconecta al Cliente dado del DualNet.
-   Eficiencia: O(log C) siendo C la cantidad de clientes del DualNet.
+   Eficiencia: O(r * log N + log C) siendo r la ruta en la que está conectado el cliente dado,
+                                    N la totalidad de elementos en el Switch del DualNet y C la
+                                    cantidad de clientes del DualNet.
    OBS: Si el Cliente no estaba conectado en el DualNet, entonces no hace nada.
 */
 void DesconectarCliente(Cliente c, DualNet dn) {
@@ -97,7 +101,8 @@ BinHeapC pinPorCliente(DualNet dn) {
 }
 
 /* Propósito: Libera el DualNet dado de memoria.
-   Eficiencia: O(r) siendo r todas los nodos del switch.
+   Eficiencia: O(n + m) siendo n la cantidad total de elementos del Switch del DualNet dado y 
+                        m la cantidad total de elementos del MapCR del DualNet dado.
 */
 void LiberarDN(DualNet dn) {
   LiberarMCR(dn->mcr);

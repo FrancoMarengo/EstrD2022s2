@@ -106,7 +106,9 @@ void AumentarEspacio(BinHeapC h) {
 void InsertHC(int pin, Cliente c, BinHeapC h) {
   if(h->curSize==h->maxSize-1) { AumentarEspacio(h); }  // Aumenta el espacio en caso de necesitarlo.
   int curNode = h->curSize + 1;
-  while(pin < h->pins[curNode/2] || (pin == h->pins[curNode/2] && esClienteMayor(h->clientes[curNode/2], c))) {
+  while(pin < h->pins[curNode/2]      // Mientras el pin dado sea menor al pin padre, o el pin dado es igual al pin padre y 
+       || ((pin == h->pins[curNode/2] // el Cliente dado es menor al Cliente padre (siempre y cuando el Cliente padre no sea NULL)
+          && esClienteMayor(h->clientes[curNode/2], c)) && h->clientes[curNode/2] != NULL)) {
     h->pins[curNode] = h->pins[curNode/2];          // Flota el par pin-cliente dado en sus respectivos arrays
     h->clientes[curNode] = h->clientes[curNode/2];  // siempre y cuando sea menor al padre.
     curNode /= 2;
